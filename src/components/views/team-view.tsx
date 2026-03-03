@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase, type Agent } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Plus } from "lucide-react";
+import { AgentDialog } from "@/components/agent-dialog";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   working: { label: "Working", color: "#10b981", bg: "#10b98118" },
@@ -15,15 +18,28 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
 export function TeamView() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase.from("agents").select("*");
+    if (data) setAgents(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase.from("agents").select("*");
-      if (data) setAgents(data);
-      setLoading(false);
-    }
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  function handleCreateClick() {
+    setEditingAgent(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditClick(agent: Agent) {
+    setEditingAgent(agent);
+    setDialogOpen(true);
+  }
 
   if (loading) {
     return (
@@ -44,6 +60,14 @@ export function TeamView() {
               {agents.length} total
             </p>
           </div>
+          <Button
+            size="sm"
+            onClick={handleCreateClick}
+            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Agent
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -52,7 +76,8 @@ export function TeamView() {
             return (
               <div
                 key={agent.id}
-                className="group rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
+                className="group cursor-pointer rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
+                onClick={() => handleEditClick(agent)}
               >
                 {/* Header */}
                 <div className="mb-4 flex items-start gap-3">
@@ -114,6 +139,13 @@ export function TeamView() {
           })}
         </div>
       </div>
+
+      <AgentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        agent={editingAgent}
+        onSaved={fetchData}
+      />
     </ScrollArea>
   );
 }

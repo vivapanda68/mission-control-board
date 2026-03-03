@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Sidebar, type ViewId } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
 import { TasksView } from "@/components/views/tasks-view";
@@ -14,19 +14,28 @@ import { supabase, type Agent } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, Activity, Cpu, HardDrive, Wifi } from "lucide-react";
+import { AgentDialog } from "@/components/agent-dialog";
 
 function AgentsView() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase.from("agents").select("*");
+    if (data) setAgents(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase.from("agents").select("*");
-      if (data) setAgents(data);
-      setLoading(false);
-    }
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  function handleEditClick(agent: Agent) {
+    setEditingAgent(agent);
+    setDialogOpen(true);
+  }
 
   if (loading) {
     return (
@@ -49,7 +58,8 @@ function AgentsView() {
           {agents.map((agent) => (
             <div
               key={agent.id}
-              className="flex items-center gap-4 rounded-lg border border-[#1e1e22] bg-[#111113] px-4 py-3 transition-colors hover:border-[#2a2a2e]"
+              className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#1e1e22] bg-[#111113] px-4 py-3 transition-colors hover:border-[#2a2a2e]"
+              onClick={() => handleEditClick(agent)}
             >
               <div
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white"
@@ -90,6 +100,13 @@ function AgentsView() {
           ))}
         </div>
       </div>
+
+      <AgentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        agent={editingAgent}
+        onSaved={fetchData}
+      />
     </ScrollArea>
   );
 }

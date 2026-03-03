@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase, type Document } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import {
   Search,
   FileText,
@@ -12,8 +13,10 @@ import {
   Settings,
   FileWarning,
   ArrowLeft,
+  Plus,
+  Pencil,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DocumentDialog } from "@/components/document-dialog";
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   markdown: FileText,
@@ -23,7 +26,6 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 function MarkdownRenderer({ content }: { content: string }) {
-  // Simple markdown-like rendering using HTML
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let inCodeBlock = false;
@@ -34,7 +36,6 @@ function MarkdownRenderer({ content }: { content: string }) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Code blocks
     if (line.startsWith("```")) {
       if (inCodeBlock) {
         elements.push(
@@ -58,16 +59,14 @@ function MarkdownRenderer({ content }: { content: string }) {
       continue;
     }
 
-    // Table rows
     if (line.startsWith("|")) {
       const cells = line
         .split("|")
         .filter((c) => c.trim())
         .map((c) => c.trim());
-      if (cells.some((c) => /^[-:]+$/.test(c))) continue; // separator row
+      if (cells.some((c) => /^[-:]+$/.test(c))) continue;
       if (!inTable) inTable = true;
       tableRows.push(cells);
-      // Check if next line is not a table
       if (!lines[i + 1]?.startsWith("|")) {
         elements.push(
           <div
@@ -78,10 +77,7 @@ function MarkdownRenderer({ content }: { content: string }) {
               <thead>
                 <tr className="border-b border-[#1e1e22] bg-[#0a0a0b]">
                   {tableRows[0]?.map((cell, ci) => (
-                    <th
-                      key={ci}
-                      className="px-3 py-1.5 text-left text-[#999]"
-                    >
+                    <th key={ci} className="px-3 py-1.5 text-left text-[#999]">
                       {cell}
                     </th>
                   ))}
@@ -107,7 +103,6 @@ function MarkdownRenderer({ content }: { content: string }) {
       continue;
     }
 
-    // Headers
     if (line.startsWith("### ")) {
       elements.push(
         <h4 key={i} className="mb-1 mt-4 text-xs font-semibold text-[#ccc]">
@@ -116,19 +111,13 @@ function MarkdownRenderer({ content }: { content: string }) {
       );
     } else if (line.startsWith("## ")) {
       elements.push(
-        <h3
-          key={i}
-          className="mb-2 mt-5 text-sm font-semibold text-[#e0e0e0]"
-        >
+        <h3 key={i} className="mb-2 mt-5 text-sm font-semibold text-[#e0e0e0]">
           {line.slice(3)}
         </h3>
       );
     } else if (line.startsWith("# ")) {
       elements.push(
-        <h2
-          key={i}
-          className="mb-3 mt-6 text-base font-bold text-white first:mt-0"
-        >
+        <h2 key={i} className="mb-3 mt-6 text-base font-bold text-white first:mt-0">
           {line.slice(2)}
         </h2>
       );
@@ -139,20 +128,17 @@ function MarkdownRenderer({ content }: { content: string }) {
           <div
             className={`h-3 w-3 rounded border ${checked ? "border-emerald-500 bg-emerald-500/20" : "border-[#444]"}`}
           />
-          <span
-            className={`text-xs ${checked ? "text-[#666] line-through" : "text-[#999]"}`}
-          >
+          <span className={`text-xs ${checked ? "text-[#666] line-through" : "text-[#999]"}`}>
             {line.slice(6)}
           </span>
         </div>
       );
     } else if (line.startsWith("- **")) {
-      // Bold list item
       const match = line.match(/^- \*\*(.+?)\*\*(.*)$/);
       if (match) {
         elements.push(
           <div key={i} className="flex gap-2 py-0.5 pl-2 text-xs">
-            <span className="text-[#444]">•</span>
+            <span className="text-[#444]">&bull;</span>
             <span>
               <strong className="text-[#ccc]">{match[1]}</strong>
               <span className="text-[#888]">{match[2]}</span>
@@ -163,7 +149,7 @@ function MarkdownRenderer({ content }: { content: string }) {
     } else if (line.startsWith("- ")) {
       elements.push(
         <div key={i} className="flex gap-2 py-0.5 pl-2 text-xs text-[#888]">
-          <span className="text-[#444]">•</span>
+          <span className="text-[#444]">&bull;</span>
           <span>{line.slice(2)}</span>
         </div>
       );
@@ -180,7 +166,6 @@ function MarkdownRenderer({ content }: { content: string }) {
     } else if (line.trim() === "") {
       elements.push(<div key={i} className="h-2" />);
     } else {
-      // Render inline code
       const parts = line.split(/(`[^`]+`)/);
       elements.push(
         <p key={i} className="text-xs leading-relaxed text-[#888]">
@@ -210,18 +195,43 @@ export function DocsView() {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<Document | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase
+      .from("documents")
+      .select("*")
+      .order("updated_at", { ascending: false });
+    if (data) {
+      setDocuments(data);
+      // Update selectedDoc if it was refreshed
+      if (selectedDoc) {
+        const updated = data.find((d) => d.id === selectedDoc.id);
+        if (updated) setSelectedDoc(updated);
+      }
+    }
+    setLoading(false);
+  }, [selectedDoc]);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase
-        .from("documents")
-        .select("*")
-        .order("updated_at", { ascending: false });
-      if (data) setDocuments(data);
-      setLoading(false);
-    }
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function handleCreateClick() {
+    setEditingDoc(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditClick(doc: Document) {
+    setEditingDoc(doc);
+    setDialogOpen(true);
+  }
+
+  function handleDialogSaved() {
+    fetchData();
+  }
 
   if (loading) {
     return (
@@ -268,7 +278,7 @@ export function DocsView() {
             </h2>
             <p className="text-[10px] text-[#555]">{selectedDoc.doc_type}</p>
           </div>
-          <div className="ml-auto flex gap-2">
+          <div className="ml-auto flex items-center gap-2">
             {selectedDoc.tags.map((tag) => (
               <Badge
                 key={tag}
@@ -278,6 +288,15 @@ export function DocsView() {
                 {tag}
               </Badge>
             ))}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleEditClick(selectedDoc)}
+              className="gap-1.5 text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit
+            </Button>
           </div>
         </div>
 
@@ -287,6 +306,13 @@ export function DocsView() {
             <MarkdownRenderer content={selectedDoc.content ?? ""} />
           </div>
         </ScrollArea>
+
+        <DocumentDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          document={editingDoc}
+          onSaved={handleDialogSaved}
+        />
       </div>
     );
   }
@@ -305,6 +331,14 @@ export function DocsView() {
               className="h-8 border-[#1e1e22] bg-[#111113] pl-8 text-xs text-[#999] placeholder:text-[#444]"
             />
           </div>
+          <Button
+            size="sm"
+            onClick={handleCreateClick}
+            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Doc
+          </Button>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {allTags.map((tag) => (
@@ -337,7 +371,7 @@ export function DocsView() {
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#111113]"
                 >
                   <Icon className="h-4 w-4 flex-shrink-0 text-[#555]" />
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium text-[#e0e0e0]">
                         {doc.title}
@@ -368,6 +402,13 @@ export function DocsView() {
           </div>
         </div>
       </ScrollArea>
+
+      <DocumentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        document={editingDoc}
+        onSaved={handleDialogSaved}
+      />
     </div>
   );
 }

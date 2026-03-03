@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase, type Project } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Plus } from "lucide-react";
+import { ProjectDialog } from "@/components/project-dialog";
 
 const statusStyles: Record<string, { color: string; bg: string }> = {
   active: { color: "#10b981", bg: "#10b98118" },
@@ -21,18 +24,31 @@ const priorityStyles: Record<string, { color: string; label: string }> = {
 export function ProjectsView() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase
+      .from("projects")
+      .select("*, agents(*)")
+      .order("created_at", { ascending: false });
+    if (data) setProjects(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase
-        .from("projects")
-        .select("*, agents(*)")
-        .order("created_at", { ascending: false });
-      if (data) setProjects(data);
-      setLoading(false);
-    }
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  function handleCreateClick() {
+    setEditingProject(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditClick(project: Project) {
+    setEditingProject(project);
+    setDialogOpen(true);
+  }
 
   if (loading) {
     return (
@@ -53,6 +69,14 @@ export function ProjectsView() {
               {projects.length} total
             </p>
           </div>
+          <Button
+            size="sm"
+            onClick={handleCreateClick}
+            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Project
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -62,7 +86,8 @@ export function ProjectsView() {
             return (
               <div
                 key={project.id}
-                className="group rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
+                className="group cursor-pointer rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
+                onClick={() => handleEditClick(project)}
               >
                 {/* Header */}
                 <div className="mb-3 flex items-start justify-between">
@@ -134,6 +159,13 @@ export function ProjectsView() {
           })}
         </div>
       </div>
+
+      <ProjectDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        project={editingProject}
+        onSaved={fetchData}
+      />
     </ScrollArea>
   );
 }

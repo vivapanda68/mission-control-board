@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase, type Schedule } from "@/lib/supabase";
-import { Radio } from "lucide-react";
+import { Radio, Plus } from "lucide-react";
+import { ScheduleDialog } from "@/components/schedule-dialog";
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8AM - 5PM
 
 interface ScheduleBlock {
   id: string;
+  scheduleId: string;
   agent: string;
   agentColor: string;
   task: string;
@@ -22,18 +25,34 @@ interface ScheduleBlock {
 export function CalendarView() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase
+      .from("schedules")
+      .select("*, agents(*)")
+      .order("time_slot");
+    if (data) setSchedules(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase
-        .from("schedules")
-        .select("*, agents(*)")
-        .order("time_slot");
-      if (data) setSchedules(data);
-      setLoading(false);
-    }
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  function handleCreateClick() {
+    setEditingSchedule(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditSchedule(scheduleId: string) {
+    const schedule = schedules.find((s) => s.id === scheduleId);
+    if (schedule) {
+      setEditingSchedule(schedule);
+      setDialogOpen(true);
+    }
+  }
 
   if (loading) {
     return (
@@ -49,6 +68,7 @@ export function CalendarView() {
     .flatMap((schedule) =>
       schedule.days_of_week.map((day) => ({
         id: `${schedule.id}-${day}`,
+        scheduleId: schedule.id,
         agent: schedule.agents?.name ?? "Unknown",
         agentColor: schedule.agents?.color ?? "#666",
         task: schedule.task_name,
@@ -61,6 +81,7 @@ export function CalendarView() {
   const alwaysRunning = schedules
     .filter((s) => s.is_always_running)
     .map((s) => ({
+      id: s.id,
       agent: s.agents?.name ?? "Unknown",
       agentColor: s.agents?.color ?? "#666",
       task: s.task_name,
@@ -81,17 +102,28 @@ export function CalendarView() {
             <Badge
               key={item.task}
               variant="outline"
-              className="gap-1.5 border-[#1e1e22] bg-[#111113] py-0.5 text-[11px]"
+              className="cursor-pointer gap-1.5 border-[#1e1e22] bg-[#111113] py-0.5 text-[11px] hover:border-[#2a2a2e]"
+              onClick={() => handleEditSchedule(item.id)}
             >
               <div
                 className="h-1.5 w-1.5 animate-pulse rounded-full"
                 style={{ backgroundColor: item.agentColor }}
               />
               <span style={{ color: item.agentColor }}>{item.agent}</span>
-              <span className="text-[#666]">·</span>
+              <span className="text-[#666]">&middot;</span>
               <span className="text-[#888]">{item.task}</span>
             </Badge>
           ))}
+        </div>
+        <div className="ml-auto">
+          <Button
+            size="sm"
+            onClick={handleCreateClick}
+            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Schedule
+          </Button>
         </div>
       </div>
 
@@ -146,12 +178,13 @@ export function CalendarView() {
                       {blocksInCell.map((block) => (
                         <div
                           key={block.id}
-                          className="rounded-md px-2 py-1.5"
+                          className="cursor-pointer rounded-md px-2 py-1.5 transition-opacity hover:opacity-80"
                           style={{
                             backgroundColor: `${block.agentColor}15`,
                             borderLeft: `2px solid ${block.agentColor}`,
                             minHeight: `${block.duration * 48 - 4}px`,
                           }}
+                          onClick={() => handleEditSchedule(block.scheduleId)}
                         >
                           <div
                             className="text-[10px] font-medium"
@@ -177,6 +210,13 @@ export function CalendarView() {
           </div>
         </div>
       </ScrollArea>
+
+      <ScheduleDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        schedule={editingSchedule}
+        onSaved={fetchData}
+      />
     </div>
   );
 }

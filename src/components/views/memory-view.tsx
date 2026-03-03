@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase, type MemoryEntry } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { BookOpen, Brain, Lightbulb, GitBranch, Database } from "lucide-react";
+import { BookOpen, Brain, Lightbulb, GitBranch, Database, Plus } from "lucide-react";
+import { MemoryDialog } from "@/components/memory-dialog";
 
 const typeConfig: Record<
   string,
@@ -17,12 +19,15 @@ const typeConfig: Record<
   long_term: { icon: Database, color: "#06b6d4", label: "Long-Term" },
 };
 
-function MemoryCard({ entry }: { entry: MemoryEntry }) {
+function MemoryCard({ entry, onClick }: { entry: MemoryEntry; onClick: () => void }) {
   const config = typeConfig[entry.entry_type] ?? typeConfig.journal;
   const Icon = config.icon;
 
   return (
-    <div className="group rounded-lg border border-[#1e1e22] bg-[#111113] p-4 transition-colors hover:border-[#2a2a2e]">
+    <div
+      className="group cursor-pointer rounded-lg border border-[#1e1e22] bg-[#111113] p-4 transition-colors hover:border-[#2a2a2e]"
+      onClick={onClick}
+    >
       <div className="mb-2 flex items-start justify-between">
         <div className="flex items-center gap-2">
           <span style={{ color: config.color }}>
@@ -66,9 +71,9 @@ function formatDate(dateStr: string): string {
   const today = new Date("2026-03-02T00:00:00");
   const yesterday = new Date("2026-03-01T00:00:00");
 
-  if (date.getTime() === today.getTime()) return "Today — March 2, 2026";
+  if (date.getTime() === today.getTime()) return "Today \u2014 March 2, 2026";
   if (date.getTime() === yesterday.getTime())
-    return "Yesterday — March 1, 2026";
+    return "Yesterday \u2014 March 1, 2026";
   return date.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -80,18 +85,31 @@ function formatDate(dateStr: string): string {
 export function MemoryView() {
   const [memoryEntries, setMemoryEntries] = useState<MemoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<MemoryEntry | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase
+      .from("memory_entries")
+      .select("*")
+      .order("entry_date", { ascending: false });
+    if (data) setMemoryEntries(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data } = await supabase
-        .from("memory_entries")
-        .select("*")
-        .order("entry_date", { ascending: false });
-      if (data) setMemoryEntries(data);
-      setLoading(false);
-    }
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  function handleCreateClick() {
+    setEditingEntry(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditClick(entry: MemoryEntry) {
+    setEditingEntry(entry);
+    setDialogOpen(true);
+  }
 
   if (loading) {
     return (
@@ -121,14 +139,24 @@ export function MemoryView() {
   return (
     <ScrollArea className="h-full">
       <div className="mx-auto max-w-3xl p-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <Brain className="h-4 w-4 text-[#6366f1]" />
-            <h2 className="text-sm font-semibold text-white">Memory Log</h2>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-[#6366f1]" />
+              <h2 className="text-sm font-semibold text-white">Memory Log</h2>
+            </div>
+            <p className="mt-0.5 text-xs text-[#555]">
+              Daily journal entries, decisions, and insights
+            </p>
           </div>
-          <p className="mt-0.5 text-xs text-[#555]">
-            Daily journal entries, decisions, and insights
-          </p>
+          <Button
+            size="sm"
+            onClick={handleCreateClick}
+            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Entry
+          </Button>
         </div>
 
         {/* Daily entries */}
@@ -142,7 +170,11 @@ export function MemoryView() {
             </div>
             <div className="flex flex-col gap-3">
               {groupedByDate[date].map((entry) => (
-                <MemoryCard key={entry.id} entry={entry} />
+                <MemoryCard
+                  key={entry.id}
+                  entry={entry}
+                  onClick={() => handleEditClick(entry)}
+                />
               ))}
             </div>
           </div>
@@ -166,10 +198,21 @@ export function MemoryView() {
 
         <div className="flex flex-col gap-3">
           {longTermEntries.map((entry) => (
-            <MemoryCard key={entry.id} entry={entry} />
+            <MemoryCard
+              key={entry.id}
+              entry={entry}
+              onClick={() => handleEditClick(entry)}
+            />
           ))}
         </div>
       </div>
+
+      <MemoryDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        entry={editingEntry}
+        onSaved={fetchData}
+      />
     </ScrollArea>
   );
 }
