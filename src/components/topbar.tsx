@@ -2,7 +2,6 @@
 
 import { Search, Pause, Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
 import type { ViewId } from "@/components/sidebar";
 
 const viewTitles: Record<ViewId, string> = {
+  dashboard: "Dashboard",
   tasks: "Tasks",
   agents: "Agents",
   calendar: "Calendar",
@@ -27,9 +27,10 @@ const viewTitles: Record<ViewId, string> = {
 
 interface TopbarProps {
   activeView: ViewId;
+  onCommandPaletteOpen?: () => void;
 }
 
-export function Topbar({ activeView }: TopbarProps) {
+export function Topbar({ activeView, onCommandPaletteOpen }: TopbarProps) {
   return (
     <header className="flex h-12 items-center justify-between border-b border-[#1e1e22] bg-[#0a0a0b] px-4">
       {/* Left: Title */}
@@ -47,16 +48,18 @@ export function Topbar({ activeView }: TopbarProps) {
 
       {/* Center: Search */}
       <div className="flex max-w-md flex-1 items-center justify-center px-8">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#555]" />
-          <Input
-            placeholder="Search tasks, agents, docs..."
-            className="h-7 border-[#1e1e22] bg-[#111113] pl-8 text-xs text-[#999] placeholder:text-[#444] focus-visible:ring-1 focus-visible:ring-[#333]"
-          />
-          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-[#1e1e22] bg-[#0a0a0b] px-1.5 py-0.5 text-[10px] text-[#555]">
+        <button
+          onClick={onCommandPaletteOpen}
+          className="relative flex w-full max-w-sm items-center rounded-md border border-[#1e1e22] bg-[#111113] px-3 py-1.5 text-left transition-colors hover:border-[#2a2a2e]"
+        >
+          <Search className="mr-2 h-3.5 w-3.5 text-[#555]" />
+          <span className="flex-1 text-xs text-[#444]">
+            Search tasks, agents, docs...
+          </span>
+          <kbd className="rounded border border-[#1e1e22] bg-[#0a0a0b] px-1.5 py-0.5 text-[10px] text-[#555]">
             ⌘K
           </kbd>
-        </div>
+        </button>
       </div>
 
       {/* Right: Actions */}

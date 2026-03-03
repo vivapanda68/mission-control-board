@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Sidebar, type ViewId } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
+import { DashboardView } from "@/components/views/dashboard-view";
 import { TasksView } from "@/components/views/tasks-view";
 import { CalendarView } from "@/components/views/calendar-view";
 import { TeamView } from "@/components/views/team-view";
@@ -10,10 +11,11 @@ import { ProjectsView } from "@/components/views/projects-view";
 import { MemoryView } from "@/components/views/memory-view";
 import { DocsView } from "@/components/views/docs-view";
 import { OfficeView } from "@/components/views/office-view";
+import { CommandPalette } from "@/components/command-palette";
 import { supabase, type Agent } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Settings, Activity, Cpu, HardDrive, Wifi } from "lucide-react";
+import { Settings, Activity, Cpu, HardDrive, Wifi, Coins } from "lucide-react";
 import { AgentDialog } from "@/components/agent-dialog";
 
 function AgentsView() {
@@ -39,8 +41,16 @@ function AgentsView() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <span className="text-sm text-[#555]">Loading...</span>
+      <div className="p-6">
+        <div className="mb-6">
+          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#1e1e22]" />
+          <div className="h-3 w-48 animate-pulse rounded bg-[#1e1e22]" />
+        </div>
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -108,6 +118,103 @@ function AgentsView() {
         onSaved={fetchData}
       />
     </ScrollArea>
+  );
+}
+
+type TokenUsage = {
+  model: string;
+  provider: string;
+  input_tokens: number;
+  output_tokens: number;
+  cost_cents: number;
+  created_at: string;
+};
+
+const mockTokenUsage: TokenUsage[] = [
+  { model: "Opus 4.6", provider: "Anthropic", input_tokens: 1_240_000, output_tokens: 380_000, cost_cents: 3720, created_at: "2026-03-03" },
+  { model: "Kimi K2", provider: "Moonshot", input_tokens: 890_000, output_tokens: 210_000, cost_cents: 1540, created_at: "2026-03-03" },
+  { model: "Claude Code", provider: "Anthropic", input_tokens: 2_100_000, output_tokens: 620_000, cost_cents: 5480, created_at: "2026-03-03" },
+  { model: "Sonnet 4.6", provider: "Anthropic", input_tokens: 560_000, output_tokens: 140_000, cost_cents: 890, created_at: "2026-03-02" },
+];
+
+function TokenUsageSection() {
+  const totalCost = mockTokenUsage.reduce((sum, u) => sum + u.cost_cents, 0);
+  const totalInput = mockTokenUsage.reduce((sum, u) => sum + u.input_tokens, 0);
+  const totalOutput = mockTokenUsage.reduce((sum, u) => sum + u.output_tokens, 0);
+  const maxCost = Math.max(...mockTokenUsage.map((u) => u.cost_cents));
+
+  const modelColors: Record<string, string> = {
+    "Opus 4.6": "#8b5cf6",
+    "Kimi K2": "#06b6d4",
+    "Claude Code": "#6366f1",
+    "Sonnet 4.6": "#10b981",
+  };
+
+  function formatTokens(n: number): string {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+    return String(n);
+  }
+
+  return (
+    <div className="mb-8 rounded-xl border border-[#1e1e22] bg-[#111113] p-5">
+      <div className="mb-4 flex items-center gap-2">
+        <Coins className="h-4 w-4 text-[#f59e0b]" />
+        <h3 className="text-xs font-medium text-[#999]">Token Usage & Cost</h3>
+        <span className="ml-auto text-xs text-[#555]">Today</span>
+      </div>
+
+      {/* Summary row */}
+      <div className="mb-5 grid grid-cols-3 gap-4">
+        <div className="rounded-lg bg-[#0a0a0b] p-3">
+          <span className="text-[10px] text-[#555]">Total Cost</span>
+          <p className="text-lg font-semibold text-white">${(totalCost / 100).toFixed(2)}</p>
+        </div>
+        <div className="rounded-lg bg-[#0a0a0b] p-3">
+          <span className="text-[10px] text-[#555]">Input Tokens</span>
+          <p className="text-lg font-semibold text-white">{formatTokens(totalInput)}</p>
+        </div>
+        <div className="rounded-lg bg-[#0a0a0b] p-3">
+          <span className="text-[10px] text-[#555]">Output Tokens</span>
+          <p className="text-lg font-semibold text-white">{formatTokens(totalOutput)}</p>
+        </div>
+      </div>
+
+      {/* Per-model breakdown */}
+      <div className="flex flex-col gap-3">
+        {mockTokenUsage.map((usage) => {
+          const pct = Math.round((usage.cost_cents / maxCost) * 100);
+          const color = modelColors[usage.model] ?? "#666";
+          return (
+            <div key={usage.model}>
+              <div className="mb-1 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-xs text-[#e0e0e0]">{usage.model}</span>
+                  <span className="text-[10px] text-[#555]">{usage.provider}</span>
+                </div>
+                <span className="text-xs font-medium text-white">
+                  ${(usage.cost_cents / 100).toFixed(2)}
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-[#1e1e22]">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%`, backgroundColor: color }}
+                />
+              </div>
+              <div className="mt-0.5 flex gap-4 text-[10px] text-[#555]">
+                <span>In: {formatTokens(usage.input_tokens)}</span>
+                <span>Out: {formatTokens(usage.output_tokens)}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -186,6 +293,9 @@ function SystemView() {
           })}
         </div>
 
+        {/* Token / Cost Tracking */}
+        <TokenUsageSection />
+
         <div className="rounded-xl border border-[#1e1e22] bg-[#111113] p-5">
           <h3 className="mb-4 text-xs font-medium text-[#999]">
             Service Health
@@ -256,6 +366,7 @@ function SystemView() {
 }
 
 const viewComponents: Record<ViewId, React.ComponentType> = {
+  dashboard: DashboardView,
   tasks: TasksView,
   agents: AgentsView,
   calendar: CalendarView,
@@ -268,18 +379,41 @@ const viewComponents: Record<ViewId, React.ComponentType> = {
 };
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<ViewId>("tasks");
+  const [activeView, setActiveView] = useState<ViewId>("dashboard");
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const ViewComponent = viewComponents[activeView];
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#0a0a0b]">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar activeView={activeView} />
-        <main className="flex-1 overflow-hidden">
+        <Topbar
+          activeView={activeView}
+          onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+        />
+        <main key={activeView} className="view-transition flex-1 overflow-hidden">
           <ViewComponent />
         </main>
       </div>
+      <CommandPalette
+        open={commandPaletteOpen}
+        onOpenChange={setCommandPaletteOpen}
+        onViewChange={(view) => {
+          setActiveView(view);
+          setCommandPaletteOpen(false);
+        }}
+      />
     </div>
   );
 }

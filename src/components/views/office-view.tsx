@@ -182,7 +182,7 @@ export function OfficeView() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <span className="text-sm text-[#555]">Loading...</span>
+        <div className="h-64 w-96 animate-pulse rounded-xl border border-[#1e1e22] bg-[#111113]" />
       </div>
     );
   }

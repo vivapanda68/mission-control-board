@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { supabase, type Task, type Activity } from "@/lib/supabase";
+import { formatRelativeTime } from "@/lib/format";
 import { Clock, MoreHorizontal, Plus, Zap } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -38,18 +40,6 @@ const priorityColors: Record<string, string> = {
   high: "#f59e0b",
 };
 
-function formatRelativeTime(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin} min ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} hr ago`;
-  const diffDay = Math.floor(diffHr / 24);
-  return `${diffDay}d ago`;
-}
 
 function TaskCard({
   task,
@@ -274,14 +264,34 @@ export function TasksView() {
         metadata: { task_id: task.id, from: task.status, to: newStatus },
         agent_id: null,
       });
+      toast.success(`Task moved to ${newStatus.replace("_", " ")}`);
       fetchData();
+    } else {
+      toast.error("Failed to move task");
     }
   }
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <span className="text-sm text-[#555]">Loading...</span>
+      <div className="flex h-full">
+        <div className="flex flex-1 flex-col">
+          <div className="flex items-center gap-6 border-b border-[#1e1e22] px-6 py-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#1e1e22]" />
+            ))}
+          </div>
+          <div className="flex gap-4 p-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex min-w-[260px] flex-1 flex-col gap-2">
+                <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#1e1e22]" />
+                {Array.from({ length: 3 }).map((_, j) => (
+                  <div key={j} className="h-24 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="w-[280px] border-l border-[#1e1e22]" />
       </div>
     );
   }

@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type Project, type Agent } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type ProjectStatus = "active" | "planning" | "paused" | "completed";
 type ProjectPriority = "high" | "medium" | "low";
@@ -121,8 +122,11 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
         .eq("id", project.id);
       if (!error) {
         await logActivity("updated project", name.trim(), { project_id: project.id, status });
+        toast.success("Project updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update project");
       }
     } else {
       const { data, error } = await supabase
@@ -132,8 +136,11 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
         .single();
       if (!error && data) {
         await logActivity("created project", name.trim(), { project_id: data.id, status });
+        toast.success("Project created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create project");
       }
     }
     setSaving(false);
@@ -145,8 +152,11 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
     const { error } = await supabase.from("projects").delete().eq("id", project.id);
     if (!error) {
       await logActivity("deleted project", project.name, { project_id: project.id });
+      toast.success("Project deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete project");
     }
     setSaving(false);
   }

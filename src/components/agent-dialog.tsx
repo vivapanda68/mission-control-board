@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type Agent } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type AgentStatus = "working" | "idle" | "paused" | "offline";
 type AutonomyLevel = "intern" | "specialist" | "lead" | "chief";
@@ -125,8 +126,11 @@ export function AgentDialog({ open, onOpenChange, agent, onSaved }: AgentDialogP
         .eq("id", agent.id);
       if (!error) {
         await logActivity("updated agent", name.trim(), { agent_id: agent.id });
+        toast.success("Agent updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update agent");
       }
     } else {
       const { data, error } = await supabase
@@ -136,8 +140,11 @@ export function AgentDialog({ open, onOpenChange, agent, onSaved }: AgentDialogP
         .single();
       if (!error && data) {
         await logActivity("created agent", name.trim(), { agent_id: data.id });
+        toast.success("Agent created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create agent");
       }
     }
     setSaving(false);
@@ -149,8 +156,11 @@ export function AgentDialog({ open, onOpenChange, agent, onSaved }: AgentDialogP
     const { error } = await supabase.from("agents").delete().eq("id", agent.id);
     if (!error) {
       await logActivity("deleted agent", agent.name, { agent_id: agent.id });
+      toast.success("Agent deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete agent");
     }
     setSaving(false);
   }

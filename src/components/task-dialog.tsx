@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type Task, type Agent, type Project } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type TaskStatus = "recurring" | "backlog" | "in_progress" | "review" | "done";
 type TaskPriority = "high" | "medium" | "low";
@@ -137,8 +138,11 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
         .eq("id", task.id);
       if (!error) {
         await logActivity("updated task", title.trim(), { task_id: task.id, status });
+        toast.success("Task updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update task");
       }
     } else {
       const { data, error } = await supabase
@@ -148,8 +152,11 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
         .single();
       if (!error && data) {
         await logActivity("created task", title.trim(), { task_id: data.id, status });
+        toast.success("Task created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create task");
       }
     }
     setSaving(false);
@@ -161,8 +168,11 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
     const { error } = await supabase.from("tasks").delete().eq("id", task.id);
     if (!error) {
       await logActivity("deleted task", task.title, { task_id: task.id });
+      toast.success("Task deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete task");
     }
     setSaving(false);
   }

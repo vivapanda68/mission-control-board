@@ -103,3 +103,12 @@ export type MemoryEntry = {
   created_at: string
   updated_at: string
 }
+
+export type TokenUsage = {
+  model: string
+  provider: string
+  input_tokens: number
+  output_tokens: number
+  cost_cents: number
+  created_at: string
+}

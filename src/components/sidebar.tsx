@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import {
+  LayoutDashboard,
   CheckSquare,
   Users,
   Calendar,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export type ViewId =
+  | "dashboard"
   | "tasks"
   | "agents"
   | "calendar"
@@ -36,6 +38,7 @@ interface SidebarProps {
 }
 
 const navItems: { id: ViewId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "tasks", label: "Tasks", icon: CheckSquare },
   { id: "team", label: "Team", icon: Users },
   { id: "calendar", label: "Calendar", icon: Calendar },

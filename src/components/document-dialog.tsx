@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type Document } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface DocumentDialogProps {
   open: boolean;
@@ -110,8 +111,11 @@ export function DocumentDialog({ open, onOpenChange, document, onSaved }: Docume
         .eq("id", document.id);
       if (!error) {
         await logActivity("updated document", title.trim(), { document_id: document.id });
+        toast.success("Document updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update document");
       }
     } else {
       const { data, error } = await supabase
@@ -121,8 +125,11 @@ export function DocumentDialog({ open, onOpenChange, document, onSaved }: Docume
         .single();
       if (!error && data) {
         await logActivity("created document", title.trim(), { document_id: data.id });
+        toast.success("Document created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create document");
       }
     }
     setSaving(false);
@@ -134,8 +141,11 @@ export function DocumentDialog({ open, onOpenChange, document, onSaved }: Docume
     const { error } = await supabase.from("documents").delete().eq("id", document.id);
     if (!error) {
       await logActivity("deleted document", document.title, { document_id: document.id });
+      toast.success("Document deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete document");
     }
     setSaving(false);
   }

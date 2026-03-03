@@ -56,8 +56,16 @@ export function CalendarView() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <span className="text-sm text-[#555]">Loading...</span>
+      <div className="p-6">
+        <div className="mb-6">
+          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#1e1e22]" />
+          <div className="h-3 w-48 animate-pulse rounded bg-[#1e1e22]" />
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg bg-[#111113]" />
+          ))}
+        </div>
       </div>
     );
   }

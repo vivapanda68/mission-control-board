@@ -30,6 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type Schedule, type Agent } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface ScheduleDialogProps {
   open: boolean;
@@ -126,8 +127,11 @@ export function ScheduleDialog({ open, onOpenChange, schedule, onSaved }: Schedu
         .eq("id", schedule.id);
       if (!error) {
         await logActivity("updated schedule", taskName.trim(), { schedule_id: schedule.id });
+        toast.success("Schedule updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update schedule");
       }
     } else {
       const { data, error } = await supabase
@@ -137,8 +141,11 @@ export function ScheduleDialog({ open, onOpenChange, schedule, onSaved }: Schedu
         .single();
       if (!error && data) {
         await logActivity("created schedule", taskName.trim(), { schedule_id: data.id });
+        toast.success("Schedule created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create schedule");
       }
     }
     setSaving(false);
@@ -150,8 +157,11 @@ export function ScheduleDialog({ open, onOpenChange, schedule, onSaved }: Schedu
     const { error } = await supabase.from("schedules").delete().eq("id", schedule.id);
     if (!error) {
       await logActivity("deleted schedule", schedule.task_name, { schedule_id: schedule.id });
+      toast.success("Schedule deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete schedule");
     }
     setSaving(false);
   }

@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase, type MemoryEntry } from "@/lib/supabase";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type EntryType = "journal" | "long_term" | "decision" | "insight";
 
@@ -116,8 +117,11 @@ export function MemoryDialog({ open, onOpenChange, entry, onSaved }: MemoryDialo
         .eq("id", entry.id);
       if (!error) {
         await logActivity("updated memory", title.trim(), { entry_id: entry.id });
+        toast.success("Memory entry updated");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to update memory entry");
       }
     } else {
       const { data, error } = await supabase
@@ -127,8 +131,11 @@ export function MemoryDialog({ open, onOpenChange, entry, onSaved }: MemoryDialo
         .single();
       if (!error && data) {
         await logActivity("created memory", title.trim(), { entry_id: data.id });
+        toast.success("Memory entry created");
         onSaved();
         onOpenChange(false);
+      } else {
+        toast.error("Failed to create memory entry");
       }
     }
     setSaving(false);
@@ -140,8 +147,11 @@ export function MemoryDialog({ open, onOpenChange, entry, onSaved }: MemoryDialo
     const { error } = await supabase.from("memory_entries").delete().eq("id", entry.id);
     if (!error) {
       await logActivity("deleted memory", entry.title, { entry_id: entry.id });
+      toast.success("Memory entry deleted");
       onSaved();
       onOpenChange(false);
+    } else {
+      toast.error("Failed to delete memory entry");
     }
     setSaving(false);
   }
