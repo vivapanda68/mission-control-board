@@ -105,10 +105,16 @@ export type MemoryEntry = {
 }
 
 export type TokenUsage = {
+  id: string
+  session_id: string
+  agent_id: string | null
   model: string
   provider: string
   input_tokens: number
   output_tokens: number
+  cache_read_tokens: number
+  cache_write_tokens: number
   cost_cents: number
+  task_description: string | null
   created_at: string
 }
