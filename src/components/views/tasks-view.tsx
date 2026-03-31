@@ -50,13 +50,13 @@ function TaskCard({
 }) {
   return (
     <div
-      className="group cursor-pointer rounded-lg border border-[#252529] bg-[#131316] p-3 transition-colors hover:border-[#3a3a3e]"
+      className="group cursor-pointer rounded-lg border border-[#252529] bg-[#131316] p-3.5 transition-colors hover:border-[#3a3a3e] active:bg-[#1a1a1e] md:p-3"
       onClick={() => onEdit(task)}
     >
       <div className="mb-2 flex items-start justify-between">
         <div className="flex items-center gap-2">
           <div
-            className="h-2 w-2 rounded-full"
+            className="h-2.5 w-2.5 rounded-full md:h-2 md:w-2"
             style={{ backgroundColor: priorityColors[task.priority] ?? "#777" }}
           />
           {task.projects?.name && (
@@ -73,10 +73,10 @@ function TaskCard({
             <Button
               variant="ghost"
               size="icon-xs"
-              className="opacity-0 group-hover:opacity-100 text-[#777] hover:text-white"
+              className="h-7 w-7 text-[#777] hover:text-white md:h-6 md:w-6 md:opacity-0 md:group-hover:opacity-100"
               onClick={(e) => e.stopPropagation()}
             >
-              <MoreHorizontal className="h-3 w-3" />
+              <MoreHorizontal className="h-4 w-4 md:h-3 md:w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -126,7 +126,7 @@ function TaskCard({
         )}
         {task.agents?.name && (
           <div
-            className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white md:h-5 md:w-5"
             style={{ backgroundColor: task.agents?.color ?? "#777" }}
           >
             {task.agents.name[0]}
@@ -188,24 +188,25 @@ function KanbanColumn({
   });
 
   return (
-    <div className="flex min-w-[260px] flex-1 flex-col">
-      <div className="mb-3 flex items-center gap-2 px-1">
+    <div className="flex flex-col md:min-w-[260px] md:flex-1">
+      {/* Column header — acts as section header on mobile */}
+      <div className="mb-2.5 flex items-center gap-2 px-1 md:mb-3">
         <div
-          className="h-2 w-2 rounded-full"
+          className="h-2.5 w-2.5 rounded-full md:h-2 md:w-2"
           style={{ backgroundColor: dotColor }}
         />
-        <span className="text-xs font-medium text-[#b0b0b0]">{label}</span>
-        <span className="text-xs text-[#666]">{columnTasks.length}</span>
+        <span className="text-sm font-semibold text-[#b0b0b0] md:text-xs md:font-medium">{label}</span>
+        <span className="text-sm text-[#666] md:text-xs">{columnTasks.length}</span>
         <Button
           variant="ghost"
           size="icon-xs"
-          className="ml-auto text-[#777] hover:text-white"
+          className="ml-auto h-7 w-7 text-[#777] hover:text-white md:h-6 md:w-6"
           onClick={onCreateInColumn}
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-4 w-4 md:h-3 md:w-3" />
         </Button>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5 md:gap-3">
         {sortedGroups.map(([projectName, projectTasks]) => (
           <div key={projectName}>
             <div className="mb-1.5 flex items-center gap-1.5 px-1">
@@ -318,14 +319,14 @@ export function TasksView() {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <div className="flex items-center gap-6 border-b border-[#252529] px-6 py-3">
+        <div className="flex items-center gap-6 border-b border-[#252529] px-4 py-3 md:px-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#252529]" />
           ))}
         </div>
-        <div className="flex gap-4 p-6">
+        <div className="flex flex-col gap-4 p-4 md:flex-row md:p-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex min-w-[260px] flex-1 flex-col gap-2">
+            <div key={i} className="flex flex-col gap-2 md:min-w-[260px] md:flex-1">
               <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#252529]" />
               {Array.from({ length: 3 }).map((_, j) => (
                 <div key={j} className="h-24 animate-pulse rounded-lg border border-[#252529] bg-[#131316]" />
@@ -340,25 +341,25 @@ export function TasksView() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#252529] px-6 py-3">
+      <div className="flex items-center justify-between border-b border-[#252529] px-4 py-3 md:px-6">
         <div className="flex items-center gap-4">
-          <span className="text-xs text-[#777]">
+          <span className="text-sm text-[#888] md:text-xs">
             {tasks.length} tasks total
           </span>
         </div>
         <Button
           size="sm"
           onClick={handleCreateClick}
-          className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+          className="h-9 gap-1.5 bg-indigo-600 px-4 text-sm text-white hover:bg-indigo-700 md:h-8 md:px-3 md:text-xs"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-4 w-4 md:h-3.5 md:w-3.5" />
           New Task
         </Button>
       </div>
 
-      {/* Kanban board */}
+      {/* Kanban board — stacked vertically on mobile, horizontal on desktop */}
       <ScrollArea className="flex-1">
-        <div className="flex gap-4 p-6">
+        <div className="flex flex-col gap-6 p-4 md:flex-row md:gap-4 md:p-6">
           {columns.map((col) => (
             <KanbanColumn
               key={col.status}

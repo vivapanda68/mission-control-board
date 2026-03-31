@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   description: "AI Agent Mission Control Dashboard",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,13 +38,13 @@ export default function RootLayout({
         {children}
         <Toaster
           theme="dark"
-          position="bottom-right"
+          position="top-center"
           toastOptions={{
             style: {
               background: "#111113",
               border: "1px solid #1e1e22",
               color: "#e0e0e0",
-              fontSize: "12px",
+              fontSize: "13px",
             },
           }}
         />
