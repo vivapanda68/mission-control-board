@@ -6,6 +6,7 @@ import {
   KanbanSquare,
   FolderKanban,
   ScrollText,
+  Timer,
 } from "lucide-react";
 import {
   Tooltip,
@@ -14,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export type ViewId = "dashboard" | "backlog" | "projects" | "activity";
+export type ViewId = "dashboard" | "backlog" | "projects" | "activity" | "crons";
 
 interface SidebarProps {
   activeView: ViewId;
@@ -26,6 +27,7 @@ const navItems: { id: ViewId; label: string; icon: React.ComponentType<{ classNa
   { id: "backlog", label: "Backlog", icon: KanbanSquare },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "activity", label: "Activity", icon: ScrollText },
+  { id: "crons", label: "Cron Jobs", icon: Timer },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {

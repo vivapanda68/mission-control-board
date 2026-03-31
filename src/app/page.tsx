@@ -7,12 +7,14 @@ import { DashboardView } from "@/components/views/dashboard-view";
 import { TasksView } from "@/components/views/tasks-view";
 import { ProjectsView } from "@/components/views/projects-view";
 import { ActivityView } from "@/components/views/activity-view";
+import { CronsView } from "@/components/views/crons-view";
 
 const viewComponents: Record<ViewId, React.ComponentType> = {
   dashboard: DashboardView,
   backlog: TasksView,
   projects: ProjectsView,
   activity: ActivityView,
+  crons: CronsView,
 };
 
 export default function Home() {

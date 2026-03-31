@@ -17,6 +17,7 @@ const viewTitles: Record<ViewId, string> = {
   backlog: "Backlog",
   projects: "Projects",
   activity: "Activity",
+  crons: "Cron Jobs",
 };
 
 interface TopbarProps {

@@ -104,6 +104,24 @@ export type MemoryEntry = {
   updated_at: string
 }
 
+export type CronJob = {
+  id: string
+  name: string
+  description: string | null
+  schedule: string
+  timezone: string
+  enabled: boolean
+  model: string | null
+  last_run_at: string | null
+  last_status: 'ok' | 'error' | 'timeout' | null
+  last_duration_ms: number | null
+  last_error: string | null
+  consecutive_errors: number
+  next_run_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export type TokenUsage = {
   id: string
   session_id: string
