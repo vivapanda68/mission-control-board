@@ -45,6 +45,10 @@ CREATE TABLE tasks (
   source_icon TEXT,
   priority TEXT DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low')),
   color TEXT DEFAULT '#6366f1',
+  input_tokens BIGINT,
+  output_tokens BIGINT,
+  cached_tokens BIGINT,
+  model_used TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

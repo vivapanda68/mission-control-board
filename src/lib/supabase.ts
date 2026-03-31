@@ -33,6 +33,10 @@ export type Task = {
   source_icon: string | null
   priority: 'high' | 'medium' | 'low'
   color: string
+  input_tokens: number | null
+  output_tokens: number | null
+  cached_tokens: number | null
+  model_used: string | null
   created_at: string
   updated_at: string
   agents?: Agent

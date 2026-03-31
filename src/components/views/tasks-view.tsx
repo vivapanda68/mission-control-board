@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { supabase, type Task } from "@/lib/supabase";
+import { formatTokenCount } from "@/lib/format";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -115,7 +116,14 @@ function TaskCard({
           {task.description}
         </p>
       )}
-      <div className="flex items-center justify-end gap-1.5">
+      <div className="flex items-center justify-between gap-1.5">
+        {task.input_tokens != null && task.output_tokens != null ? (
+          <span className="text-[10px] text-[#666]">
+            {formatTokenCount(task.input_tokens)} in / {formatTokenCount(task.output_tokens)} out{task.model_used ? ` \u00b7 ${task.model_used}` : ""}
+          </span>
+        ) : (
+          <span />
+        )}
         {task.agents?.name && (
           <div
             className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
@@ -277,10 +285,21 @@ export function TasksView() {
     setDialogOpen(true);
   }
 
-  async function handleStatusChange(task: Task, newStatus: TaskStatus) {
+  async function handleStatusChange(
+    task: Task,
+    newStatus: TaskStatus,
+    tokenData?: { input_tokens?: number; output_tokens?: number; cached_tokens?: number; model_used?: string },
+  ) {
     const { error } = await supabase
       .from("tasks")
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .update({
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+        ...(tokenData?.input_tokens != null && { input_tokens: tokenData.input_tokens }),
+        ...(tokenData?.output_tokens != null && { output_tokens: tokenData.output_tokens }),
+        ...(tokenData?.cached_tokens != null && { cached_tokens: tokenData.cached_tokens }),
+        ...(tokenData?.model_used != null && { model_used: tokenData.model_used }),
+      })
       .eq("id", task.id);
     if (!error) {
       await supabase.from("activities").insert({
