@@ -161,6 +161,24 @@ function KanbanColumn({
       return (order[a.priority] ?? 1) - (order[b.priority] ?? 1);
     });
 
+  // Group tasks by project
+  const grouped: Record<string, Task[]> = {};
+  const noProject: Task[] = [];
+  for (const task of columnTasks) {
+    const projectName = task.projects?.name;
+    if (projectName) {
+      if (!grouped[projectName]) grouped[projectName] = [];
+      grouped[projectName].push(task);
+    } else {
+      noProject.push(task);
+    }
+  }
+  // Sort project groups by first task priority
+  const sortedGroups = Object.entries(grouped).sort(([, a], [, b]) => {
+    const order: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    return (order[a[0]?.priority] ?? 1) - (order[b[0]?.priority] ?? 1);
+  });
+
   return (
     <div className="flex min-w-[260px] flex-1 flex-col">
       <div className="mb-3 flex items-center gap-2 px-1">
@@ -179,15 +197,52 @@ function KanbanColumn({
           <Plus className="h-3 w-3" />
         </Button>
       </div>
-      <div className="flex flex-col gap-2">
-        {columnTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onEdit={onEdit}
-            onStatusChange={onStatusChange}
-          />
+      <div className="flex flex-col gap-3">
+        {sortedGroups.map(([projectName, projectTasks]) => (
+          <div key={projectName}>
+            <div className="mb-1.5 flex items-center gap-1.5 px-1">
+              <div
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: "#6366f1" }}
+              />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">
+                {projectName}
+              </span>
+              <span className="text-[10px] text-[#333]">{projectTasks.length}</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {projectTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onEdit={onEdit}
+                  onStatusChange={onStatusChange}
+                />
+              ))}
+            </div>
+          </div>
         ))}
+        {noProject.length > 0 && (
+          <div>
+            <div className="mb-1.5 flex items-center gap-1.5 px-1">
+              <div className="h-1.5 w-1.5 rounded-full bg-[#333]" />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">
+                Unassigned
+              </span>
+              <span className="text-[10px] text-[#333]">{noProject.length}</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {noProject.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onEdit={onEdit}
+                  onStatusChange={onStatusChange}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
