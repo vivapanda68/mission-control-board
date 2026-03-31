@@ -3,15 +3,9 @@
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  CheckSquare,
-  Users,
-  Calendar,
+  KanbanSquare,
   FolderKanban,
-  Brain,
-  FileText,
-  UserCircle,
-  Building2,
-  Settings,
+  ScrollText,
 } from "lucide-react";
 import {
   Tooltip,
@@ -20,17 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export type ViewId =
-  | "dashboard"
-  | "tasks"
-  | "agents"
-  | "calendar"
-  | "projects"
-  | "memory"
-  | "docs"
-  | "team"
-  | "office"
-  | "system";
+export type ViewId = "dashboard" | "backlog" | "projects" | "activity";
 
 interface SidebarProps {
   activeView: ViewId;
@@ -39,18 +23,9 @@ interface SidebarProps {
 
 const navItems: { id: ViewId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "tasks", label: "Tasks", icon: CheckSquare },
-  { id: "team", label: "Team", icon: Users },
-  { id: "calendar", label: "Calendar", icon: Calendar },
+  { id: "backlog", label: "Backlog", icon: KanbanSquare },
   { id: "projects", label: "Projects", icon: FolderKanban },
-  { id: "memory", label: "Memory", icon: Brain },
-  { id: "docs", label: "Docs", icon: FileText },
-  { id: "office", label: "Office", icon: Building2 },
-];
-
-const bottomItems: { id: ViewId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: "agents", label: "Agents", icon: UserCircle },
-  { id: "system", label: "System", icon: Settings },
+  { id: "activity", label: "Activity", icon: ScrollText },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
@@ -89,34 +64,6 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             );
           })}
         </nav>
-
-        {/* Bottom nav */}
-        <div className="flex flex-col items-center gap-1">
-          {bottomItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeView === item.id;
-            return (
-              <Tooltip key={item.id}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => onViewChange(item.id)}
-                    className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
-                      isActive
-                        ? "bg-[#1e1e22] text-white"
-                        : "text-[#555] hover:bg-[#151517] hover:text-[#888]"
-                    )}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>
-                  {item.label}
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </div>
       </aside>
     </TooltipProvider>
   );

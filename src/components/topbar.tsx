@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Pause, Bell, ChevronDown } from "lucide-react";
+import { Bell, Pause, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,23 +14,16 @@ import type { ViewId } from "@/components/sidebar";
 
 const viewTitles: Record<ViewId, string> = {
   dashboard: "Dashboard",
-  tasks: "Tasks",
-  agents: "Agents",
-  calendar: "Calendar",
+  backlog: "Backlog",
   projects: "Projects",
-  memory: "Memory",
-  docs: "Documents",
-  team: "Team",
-  office: "Office",
-  system: "System",
+  activity: "Activity",
 };
 
 interface TopbarProps {
   activeView: ViewId;
-  onCommandPaletteOpen?: () => void;
 }
 
-export function Topbar({ activeView, onCommandPaletteOpen }: TopbarProps) {
+export function Topbar({ activeView }: TopbarProps) {
   return (
     <header className="flex h-12 items-center justify-between border-b border-[#1e1e22] bg-[#0a0a0b] px-4">
       {/* Left: Title */}
@@ -44,22 +37,6 @@ export function Topbar({ activeView, onCommandPaletteOpen }: TopbarProps) {
         >
           Mission Control
         </Badge>
-      </div>
-
-      {/* Center: Search */}
-      <div className="flex max-w-md flex-1 items-center justify-center px-8">
-        <button
-          onClick={onCommandPaletteOpen}
-          className="relative flex w-full max-w-sm items-center rounded-md border border-[#1e1e22] bg-[#111113] px-3 py-1.5 text-left transition-colors hover:border-[#2a2a2e]"
-        >
-          <Search className="mr-2 h-3.5 w-3.5 text-[#555]" />
-          <span className="flex-1 text-xs text-[#444]">
-            Search tasks, agents, docs...
-          </span>
-          <kbd className="rounded border border-[#1e1e22] bg-[#0a0a0b] px-1.5 py-0.5 text-[10px] text-[#555]">
-            ⌘K
-          </kbd>
-        </button>
       </div>
 
       {/* Right: Actions */}
@@ -90,9 +67,9 @@ export function Topbar({ activeView, onCommandPaletteOpen }: TopbarProps) {
               className="gap-2 text-[#999] hover:bg-[#1e1e22] hover:text-white"
             >
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600">
-                <span className="text-[10px] font-bold text-white">U</span>
+                <span className="text-[10px] font-bold text-white">N</span>
               </div>
-              <span className="text-xs">Operator</span>
+              <span className="text-xs">Nam</span>
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>

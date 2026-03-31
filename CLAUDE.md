@@ -1,89 +1,118 @@
-# Mission Control Board - Claude Code Instructions
+# Mission Control Board — Redesign
 
 ## Project
-Next.js 16 + Supabase + shadcn/ui + Tailwind CSS. Dark theme (#0a0a0b background).
-Deployed at: https://mission-control-board.vercel.app
+Next.js 16 + Supabase + shadcn/ui + Tailwind CSS. Dark theme (#0a0a0b).
 
-## Current State
-- All views exist: tasks, agents, calendar, projects, memory, docs, team, office, system
-- CRUD dialogs exist for all views (task-dialog, agent-dialog, project-dialog, etc.)
-- Supabase client at `src/lib/supabase.ts` with types defined
-- Build passes clean
+## Goal
+Redesign the dashboard to be a practical command center for Nam to oversee all work at a glance. Strip out fluff views, focus on actionable information.
 
-## Task: Implement Remaining Features
+## What to Build
 
-### 1. Dashboard Overview (Priority: HIGH)
-Create a new "dashboard" view as the default landing page. Should show:
-- Quick stats cards: total tasks, active agents, upcoming events, active projects
-- Recent activity feed (last 10 activities from `activities` table)
-- Task breakdown by status (small bar chart or progress bars)
-- Agent status overview (who's working, idle, offline)
-- Replace "tasks" as the default view in page.tsx
+### 1. New Sidebar (simplified)
+Replace current 10+ views with just 4:
+- 📊 **Dashboard** (default) — overview of everything
+- 📋 **Backlog** — kanban board: To Do → In Progress → Review → Done
+- 🗂️ **Projects** — project cards with drill-down
+- 📜 **Activity** — chronological activity log
 
-### 2. Token/Cost Tracking (Priority: HIGH)
-First, create the `token_usage` table via Supabase client (use raw SQL via supabase.rpc or just create the view without the table for now):
-- Add a "Usage" section to the dashboard or system view showing:
-  - Daily/weekly/monthly token usage
-  - Cost breakdown by model (Opus 4.6, Kimi K2, Claude Code)
-  - Simple bar/progress visualization
-- For now, use mock data structure but make it easy to connect real data later:
-  ```ts
-  type TokenUsage = { model: string; provider: string; input_tokens: number; output_tokens: number; cost_cents: number; created_at: string; }
-  ```
+Remove: calendar, team, docs, memory, office, system, agents views.
+Keep the sidebar clean and minimal.
 
-### 3. ⌘K Command Palette (Priority: MEDIUM)
-- Global keyboard shortcut ⌘K (or Ctrl+K)
-- Search across tasks, projects, agents, docs
-- Quick actions: create task, switch view, etc.
-- Use a dialog/overlay with search input
-- Install cmdk package: `npm install cmdk`
+### 2. Dashboard View (complete rewrite)
+This is the main landing page. Should answer "what's happening?" in 5 seconds.
 
-### 4. Real-Time Activity Feed (Priority: MEDIUM)
-- In the dashboard, show a live activity feed
-- Query `activities` table ordered by created_at desc
-- Show agent avatar/color, action description, timestamp
-- Auto-refresh every 30 seconds or use Supabase realtime subscription
+**Top row — Stats:**
+- Active projects count
+- Tasks in progress
+- Tasks in backlog
+- Completed this month
 
-### 5. Toast Notifications (Priority: LOW)
-- Install sonner: `npx shadcn@latest add sonner`
-- Add toast notifications for all CRUD operations (create/edit/delete success/error)
-- Add the Toaster component to layout.tsx
+**Left column (60%) — Current Sprint:**
+- "In Progress" tasks with project badge and priority indicator
+- "In Review" tasks
+- Sorted by priority (high → medium → low)
+- Click task to edit
 
-### 6. Polish & Improvements (Priority: LOW)
-- Add relative timestamps everywhere (e.g., "2 hours ago")
-- Improve responsive layout for mobile/tablet
-- Add loading skeletons instead of plain "Loading..." text
-- Smooth transitions between views
+**Right column (40%) — Activity Feed:**
+- Last 15 activities with relative timestamps
+- Agent avatar, action, description
+- Auto-scrolling
 
-## Style Guidelines
-- Background: #0a0a0b
-- Card bg: #111113
-- Border: #1e1e22
-- Hover border: #2a2a2e
-- Text primary: #e0e0e0
-- Text secondary: #666, #555
-- Accent colors: emerald for success, amber for warning, indigo for info
-- Keep everything dark themed, minimal, clean
+**Bottom row — Project Health:**
+- Each active project as a compact card
+- Project name, status badge, progress bar, task count
+- Click to go to project detail
 
-## DO NOT
-- Do not modify .env.local
-- Do not break existing CRUD dialogs
-- Do not remove existing views or components
-- Keep the build passing at all times
+### 3. Backlog View (kanban rewrite)
+Four columns:
+- **To Do** (backlog) — prioritized, draggable
+- **In Progress** — currently being worked on
+- **Review** — needs Nam's review
+- **Done** — completed (last 2 weeks only, older auto-hidden)
 
-## Data shape
-```sql
-tasks: id, title, description, status, assignee_id, project_id, source, source_icon, priority, color, created_at, updated_at
-agents: id, name, role, color, status, current_task, model, capabilities, created_at, updated_at
-projects: id, name, description, status, color, progress, agent_ids, created_at, updated_at
+Each card shows: title, priority color (red/yellow/green), project badge, assignee avatar
+Click to edit. "+ New Task" button at top of each column.
+
+### 4. Projects View (enhanced)
+Card grid showing each project:
+- Name, description, status badge (active/planning/paused)
+- Progress bar
+- Task breakdown: X backlog, X in progress, X done
+- Last activity date
+- Click to expand → shows that project's tasks and recent activity
+
+### 5. Activity View
+Full chronological timeline:
+- Grouped by date
+- Agent avatar + name, action, description, timestamp
+- Filter by agent or project
+- Infinite scroll / load more
+
+## Supabase Schema (unchanged)
+```
+tasks: id, title, description, status, assignee_id, project_id, priority, created_at, updated_at
+projects: id, name, description, status, color, progress, created_at, updated_at
 activities: id, agent_id, action, description, metadata, created_at
-calendar_events: id, title, description, event_date, event_time, duration_minutes, event_type, agent_id, project_id, created_at
-documents: id, title, content, doc_type, agent_id, project_id, tags, created_at, updated_at
-memory_entries: id, agent_id, content, memory_type, importance, source, created_at
+agents: id, name, role, color, status, current_task
+token_usage: id, agent_id, model, provider, input_tokens, output_tokens, cost_cents, task_description, created_at
 ```
 
-## Sidebar ViewIds
-Current: tasks, agents, calendar, projects, memory, docs, team, office, system
-Add: dashboard (as first item, make it default)
+## Style
+- Background: #0a0a0b
+- Cards: #111113 with #1e1e22 borders
+- Hover: #2a2a2e borders
+- Text: #e0e0e0 primary, #888 secondary, #555 muted
+- Priority: red=#ef4444, yellow=#f59e0b, green=#22c55e
+- Status badges: emerald=active, amber=in_progress, blue=review, gray=done, slate=paused
+- Keep it minimal, clean, professional. No clutter.
 
-When completely finished, run: openclaw system event --text "Done: Dashboard, token tracking, command palette, activity feed, toasts, and polish added to Mission Control" --mode now
+## DO NOT
+- Do not modify .env.local or supabase.ts (connection)
+- Do not add new npm dependencies except shadcn components if needed
+- Do not change the Supabase schema
+- Keep build passing
+
+## Remove
+Delete these files (no longer needed):
+- src/components/views/calendar-view.tsx
+- src/components/views/docs-view.tsx
+- src/components/views/memory-view.tsx
+- src/components/views/office-view.tsx
+- src/components/views/team-view.tsx
+- src/components/command-palette.tsx (rebuild if time permits)
+- src/components/schedule-dialog.tsx
+- src/components/document-dialog.tsx
+- src/components/memory-dialog.tsx
+- src/components/agent-dialog.tsx
+
+## Keep & Modify
+- src/components/sidebar.tsx — simplify to 4 views
+- src/components/topbar.tsx — keep, clean up
+- src/components/views/dashboard-view.tsx — complete rewrite
+- src/components/views/tasks-view.tsx — transform into kanban backlog
+- src/components/views/projects-view.tsx — enhance with drill-down
+- src/components/task-dialog.tsx — keep for CRUD
+- src/components/project-dialog.tsx — keep for CRUD
+- src/app/page.tsx — update view mapping
+
+When completely finished, run: openclaw system event --text "Done: Mission Control redesigned — dashboard, backlog, projects, activity" --mode now

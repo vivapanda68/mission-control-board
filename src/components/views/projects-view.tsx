@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { supabase, type Project } from "@/lib/supabase";
+import { supabase, type Project, type Task, type Activity } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { ProjectDialog } from "@/components/project-dialog";
+import { TaskDialog } from "@/components/task-dialog";
+import { formatRelativeTime } from "@/lib/format";
 
 const statusStyles: Record<string, { color: string; bg: string }> = {
   active: { color: "#10b981", bg: "#10b98118" },
@@ -16,16 +18,266 @@ const statusStyles: Record<string, { color: string; bg: string }> = {
 };
 
 const priorityStyles: Record<string, { color: string; label: string }> = {
-  low: { color: "#555", label: "Low" },
-  medium: { color: "#6366f1", label: "Medium" },
-  high: { color: "#f59e0b", label: "High" },
+  low: { color: "#22c55e", label: "Low" },
+  medium: { color: "#f59e0b", label: "Medium" },
+  high: { color: "#ef4444", label: "High" },
 };
 
+// --- Project Detail (drill-down) ---
+function ProjectDetail({
+  project,
+  onBack,
+  onEditProject,
+}: {
+  project: Project;
+  onBack: () => void;
+  onEditProject: () => void;
+}) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const [tasksRes, activitiesRes] = await Promise.all([
+      supabase
+        .from("tasks")
+        .select("*, agents(*), projects(*)")
+        .eq("project_id", project.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("activities")
+        .select("*, agents(*)")
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
+    if (tasksRes.data) setTasks(tasksRes.data);
+    // Filter activities related to this project
+    if (activitiesRes.data) {
+      const projectActivities = activitiesRes.data.filter(
+        (a) =>
+          (a.metadata as Record<string, unknown>)?.project_id === project.id ||
+          tasks.some(
+            (t) =>
+              t.id === (a.metadata as Record<string, unknown>)?.task_id
+          )
+      );
+      setActivities(
+        projectActivities.length > 0 ? projectActivities : activitiesRes.data.slice(0, 5)
+      );
+    }
+    setLoading(false);
+  }, [project.id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const status = statusStyles[project.status] ?? statusStyles.active;
+  const backlog = tasks.filter((t) => t.status === "backlog" || t.status === "recurring").length;
+  const inProgress = tasks.filter((t) => t.status === "in_progress").length;
+  const done = tasks.filter((t) => t.status === "done").length;
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6">
+        {/* Back button + header */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="mb-3 flex items-center gap-1.5 text-xs text-[#888] transition-colors hover:text-white"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to Projects
+          </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-white">
+                  {project.name}
+                </h2>
+                <Badge
+                  variant="outline"
+                  className="border-transparent px-1.5 py-0 text-[10px] capitalize"
+                  style={{ backgroundColor: status.bg, color: status.color }}
+                >
+                  {project.status}
+                </Badge>
+              </div>
+              {project.description && (
+                <p className="mt-1 text-xs text-[#888]">
+                  {project.description}
+                </p>
+              )}
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onEditProject}
+              className="text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+            >
+              Edit Project
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
+            <span className="text-[10px] text-[#555]">Backlog</span>
+            <p className="text-lg font-semibold text-white">{backlog}</p>
+          </div>
+          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
+            <span className="text-[10px] text-[#555]">In Progress</span>
+            <p className="text-lg font-semibold text-white">{inProgress}</p>
+          </div>
+          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
+            <span className="text-[10px] text-[#555]">Done</span>
+            <p className="text-lg font-semibold text-white">{done}</p>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-6">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs text-[#999]">Progress</span>
+            <span className="text-xs font-medium text-white">
+              {project.progress_percent}%
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#1e1e22]">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${project.progress_percent}%`,
+                backgroundColor: status.color,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Tasks list */}
+        <div className="mb-6">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-white">Tasks</h3>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingTask(null);
+                setTaskDialogOpen(true);
+              }}
+              className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+            >
+              <Plus className="h-3 w-3" />
+              Add Task
+            </Button>
+          </div>
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-12 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {tasks.map((task) => {
+                const priority = priorityStyles[task.priority] ?? priorityStyles.medium;
+                return (
+                  <div
+                    key={task.id}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#1e1e22] bg-[#111113] px-4 py-3 transition-colors hover:border-[#2a2a2e]"
+                    onClick={() => {
+                      setEditingTask(task);
+                      setTaskDialogOpen(true);
+                    }}
+                  >
+                    <div
+                      className="h-2 w-2 flex-shrink-0 rounded-full"
+                      style={{ backgroundColor: priority.color }}
+                    />
+                    <span className="flex-1 truncate text-sm text-[#e0e0e0]">
+                      {task.title}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="border-transparent bg-[#1e1e22] px-1.5 py-0 text-[9px] capitalize text-[#888]"
+                    >
+                      {task.status.replace("_", " ")}
+                    </Badge>
+                    {task.agents?.name && (
+                      <div
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white"
+                        style={{ backgroundColor: task.agents.color }}
+                      >
+                        {task.agents.name[0]}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {tasks.length === 0 && (
+                <span className="text-xs text-[#555]">No tasks yet</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Activity */}
+        <div>
+          <h3 className="mb-3 text-sm font-semibold text-white">
+            Recent Activity
+          </h3>
+          <div className="flex flex-col gap-1">
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#111113]"
+              >
+                <div
+                  className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white"
+                  style={{ backgroundColor: activity.agents?.color ?? "#666" }}
+                >
+                  {(activity.agents?.name ?? "?")[0]}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-[#888]">
+                    <span
+                      className="font-medium"
+                      style={{ color: activity.agents?.color ?? "#666" }}
+                    >
+                      {activity.agents?.name ?? "System"}
+                    </span>{" "}
+                    {activity.action}{" "}
+                    <span className="text-[#ccc]">{activity.description}</span>
+                  </p>
+                  <span className="text-[10px] text-[#444]">
+                    {formatRelativeTime(activity.created_at)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <TaskDialog
+        open={taskDialogOpen}
+        onOpenChange={setTaskDialogOpen}
+        task={editingTask}
+        onSaved={fetchData}
+      />
+    </ScrollArea>
+  );
+}
+
+// --- Main Projects View ---
 export function ProjectsView() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const fetchData = useCallback(async () => {
     const { data } = await supabase
@@ -48,6 +300,17 @@ export function ProjectsView() {
   function handleEditClick(project: Project) {
     setEditingProject(project);
     setDialogOpen(true);
+  }
+
+  // If a project is selected, show detail view
+  if (selectedProject) {
+    return (
+      <ProjectDetail
+        project={selectedProject}
+        onBack={() => setSelectedProject(null)}
+        onEditProject={() => handleEditClick(selectedProject)}
+      />
+    );
   }
 
   if (loading) {
@@ -95,7 +358,7 @@ export function ProjectsView() {
               <div
                 key={project.id}
                 className="group cursor-pointer rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
-                onClick={() => handleEditClick(project)}
+                onClick={() => setSelectedProject(project)}
               >
                 {/* Header */}
                 <div className="mb-3 flex items-start justify-between">
@@ -128,21 +391,25 @@ export function ProjectsView() {
                       </Badge>
                     </div>
                   </div>
-                  <div
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                    style={{ backgroundColor: project.agents?.color ?? "#666" }}
-                  >
-                    {(project.agents?.name ?? "?").substring(0, 2).toUpperCase()}
-                  </div>
+                  {project.agents?.name && (
+                    <div
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                      style={{ backgroundColor: project.agents?.color ?? "#666" }}
+                    >
+                      {project.agents.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
-                <p className="mb-4 text-xs leading-relaxed text-[#888]">
-                  {project.description}
-                </p>
+                {project.description && (
+                  <p className="mb-4 line-clamp-2 text-xs leading-relaxed text-[#888]">
+                    {project.description}
+                  </p>
+                )}
 
                 {/* Progress */}
-                <div className="mb-4">
+                <div className="mb-2">
                   <div className="mb-1.5 flex items-center justify-between">
                     <span className="text-[10px] text-[#555]">Progress</span>
                     <span className="text-[10px] font-medium text-[#999]">
@@ -154,13 +421,20 @@ export function ProjectsView() {
                       className="h-full rounded-full transition-all"
                       style={{
                         width: `${project.progress_percent}%`,
-                        backgroundColor: project.agents?.color ?? "#666",
+                        backgroundColor: project.agents?.color ?? status.color,
                       }}
                     />
                   </div>
-                  <div className="mt-1 text-[10px] text-[#555]">
-                    {project.completed_tasks} / {project.total_tasks} tasks
-                  </div>
+                </div>
+
+                {/* Task count + last activity */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#555]">
+                    {project.completed_tasks}/{project.total_tasks} tasks
+                  </span>
+                  <span className="text-[10px] text-[#444]">
+                    {formatRelativeTime(project.updated_at)}
+                  </span>
                 </div>
               </div>
             );

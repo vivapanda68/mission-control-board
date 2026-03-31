@@ -3,9 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { supabase, type Task, type Activity } from "@/lib/supabase";
-import { formatRelativeTime } from "@/lib/format";
-import { Clock, MoreHorizontal, Plus, Zap } from "lucide-react";
+import { supabase, type Task } from "@/lib/supabase";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,29 +16,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TaskDialog } from "@/components/task-dialog";
 
-type TaskStatus = "recurring" | "backlog" | "in_progress" | "review" | "done";
+type TaskStatus = "backlog" | "in_progress" | "review" | "done";
 
 const columns: { status: TaskStatus; label: string; dotColor: string }[] = [
-  { status: "recurring", label: "Recurring", dotColor: "#6366f1" },
-  { status: "backlog", label: "Backlog", dotColor: "#666" },
+  { status: "backlog", label: "To Do", dotColor: "#666" },
   { status: "in_progress", label: "In Progress", dotColor: "#10b981" },
   { status: "review", label: "Review", dotColor: "#f59e0b" },
+  { status: "done", label: "Done", dotColor: "#06b6d4" },
 ];
 
 const allStatuses: { value: TaskStatus; label: string }[] = [
-  { value: "recurring", label: "Recurring" },
-  { value: "backlog", label: "Backlog" },
+  { value: "backlog", label: "To Do" },
   { value: "in_progress", label: "In Progress" },
   { value: "review", label: "Review" },
   { value: "done", label: "Done" },
 ];
 
 const priorityColors: Record<string, string> = {
-  low: "#555",
-  medium: "#6366f1",
-  high: "#f59e0b",
+  low: "#22c55e",
+  medium: "#f59e0b",
+  high: "#ef4444",
 };
-
 
 function TaskCard({
   task,
@@ -59,9 +56,16 @@ function TaskCard({
         <div className="flex items-center gap-2">
           <div
             className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: task.agents?.color ?? task.color }}
+            style={{ backgroundColor: priorityColors[task.priority] ?? "#666" }}
           />
-          <span className="text-xs text-[#666]">{task.id.slice(0, 8)}</span>
+          {task.projects?.name && (
+            <Badge
+              variant="outline"
+              className="border-transparent bg-[#1e1e22] px-1.5 py-0 text-[9px] text-[#888]"
+            >
+              {task.projects.name}
+            </Badge>
+          )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -106,25 +110,20 @@ function TaskCard({
       <h4 className="mb-1 text-[13px] font-medium text-[#e0e0e0]">
         {task.title}
       </h4>
-      <p className="mb-3 text-xs leading-relaxed text-[#666]">
-        {task.description}
-      </p>
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1" />
-        <div className="flex items-center gap-1.5">
-          {task.agents?.name && (
-            <div
-              className="flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white"
-              style={{ backgroundColor: task.agents?.color ?? task.color }}
-            >
-              {task.agents.name[0]}
-            </div>
-          )}
+      {task.description && (
+        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-[#666]">
+          {task.description}
+        </p>
+      )}
+      <div className="flex items-center justify-end gap-1.5">
+        {task.agents?.name && (
           <div
-            className="h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: priorityColors[task.priority] }}
-          />
-        </div>
+            className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white"
+            style={{ backgroundColor: task.agents?.color ?? "#666" }}
+          >
+            {task.agents.name[0]}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -137,6 +136,7 @@ function KanbanColumn({
   tasks,
   onEdit,
   onStatusChange,
+  onCreateInColumn,
 }: {
   status: TaskStatus;
   label: string;
@@ -144,8 +144,23 @@ function KanbanColumn({
   tasks: Task[];
   onEdit: (task: Task) => void;
   onStatusChange: (task: Task, status: TaskStatus) => void;
+  onCreateInColumn: () => void;
 }) {
-  const columnTasks = tasks.filter((t) => t.status === status);
+  // For "done" column, only show last 2 weeks
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+  const columnTasks = tasks
+    .filter((t) => {
+      if (t.status !== status) return false;
+      if (status === "done" && new Date(t.updated_at) < twoWeeksAgo) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 };
+      return (order[a.priority] ?? 1) - (order[b.priority] ?? 1);
+    });
+
   return (
     <div className="flex min-w-[260px] flex-1 flex-col">
       <div className="mb-3 flex items-center gap-2 px-1">
@@ -155,6 +170,14 @@ function KanbanColumn({
         />
         <span className="text-xs font-medium text-[#999]">{label}</span>
         <span className="text-xs text-[#444]">{columnTasks.length}</span>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          className="ml-auto text-[#555] hover:text-white"
+          onClick={onCreateInColumn}
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
       </div>
       <div className="flex flex-col gap-2">
         {columnTasks.map((task) => (
@@ -170,71 +193,18 @@ function KanbanColumn({
   );
 }
 
-function LiveActivitySidebar({ activities }: { activities: Activity[] }) {
-  return (
-    <div className="flex w-[280px] flex-col border-l border-[#1e1e22]">
-      <div className="flex items-center gap-2 border-b border-[#1e1e22] px-4 py-3">
-        <Zap className="h-3.5 w-3.5 text-emerald-500" />
-        <span className="text-xs font-medium text-[#999]">Live Activity</span>
-        <div className="ml-auto h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="flex flex-col gap-0.5 p-2">
-          {activities.map((activity) => (
-            <div
-              key={activity.id}
-              className="group flex gap-2 rounded-md px-2 py-2 transition-colors hover:bg-[#111113]"
-            >
-              <div
-                className="mt-0.5 h-5 w-5 flex-shrink-0 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
-                style={{ backgroundColor: activity.agents?.color ?? "#666" }}
-              >
-                {(activity.agents?.name ?? "?")[0]}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs leading-relaxed text-[#888]">
-                  <span
-                    className="font-medium"
-                    style={{ color: activity.agents?.color ?? "#666" }}
-                  >
-                    {activity.agents?.name ?? "Unknown"}
-                  </span>{" "}
-                  {activity.action}{" "}
-                  <span className="text-[#ccc]">{activity.description}</span>
-                </p>
-                <span className="text-[10px] text-[#444]">
-                  {formatRelativeTime(activity.created_at)}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
-  );
-}
-
 export function TasksView() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, activitiesRes] = await Promise.all([
-      supabase
-        .from("tasks")
-        .select("*, agents(*), projects(*)")
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("activities")
-        .select("*, agents(*)")
-        .order("created_at", { ascending: false })
-        .limit(20),
-    ]);
-    if (tasksRes.data) setTasks(tasksRes.data);
-    if (activitiesRes.data) setActivities(activitiesRes.data);
+    const { data } = await supabase
+      .from("tasks")
+      .select("*, agents(*), projects(*)")
+      .order("created_at", { ascending: false });
+    if (data) setTasks(data);
     setLoading(false);
   }, []);
 
@@ -273,101 +243,63 @@ export function TasksView() {
 
   if (loading) {
     return (
-      <div className="flex h-full">
-        <div className="flex flex-1 flex-col">
-          <div className="flex items-center gap-6 border-b border-[#1e1e22] px-6 py-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#1e1e22]" />
-            ))}
-          </div>
-          <div className="flex gap-4 p-6">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex min-w-[260px] flex-1 flex-col gap-2">
-                <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#1e1e22]" />
-                {Array.from({ length: 3 }).map((_, j) => (
-                  <div key={j} className="h-24 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
-                ))}
-              </div>
-            ))}
-          </div>
+      <div className="flex h-full flex-col">
+        <div className="flex items-center gap-6 border-b border-[#1e1e22] px-6 py-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#1e1e22]" />
+          ))}
         </div>
-        <div className="w-[280px] border-l border-[#1e1e22]" />
+        <div className="flex gap-4 p-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex min-w-[260px] flex-1 flex-col gap-2">
+              <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#1e1e22]" />
+              {Array.from({ length: 3 }).map((_, j) => (
+                <div key={j} className="h-24 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
-  const totalTasks = tasks.length;
-  const inProgress = tasks.filter((t) => t.status === "in_progress").length;
-  const inReview = tasks.filter((t) => t.status === "review").length;
-  const activeAgents = new Set(
-    tasks.filter((t) => t.agents?.name).map((t) => t.agents?.name)
-  ).size;
-
-  const stats = [
-    { label: "Total Tasks", value: totalTasks },
-    { label: "In Progress", value: inProgress, color: "#10b981" },
-    { label: "In Review", value: inReview, color: "#f59e0b" },
-    { label: "Active Agents", value: activeAgents, color: "#6366f1" },
-  ];
-
   return (
-    <div className="flex h-full">
-      <div className="flex flex-1 flex-col">
-        {/* Stats header */}
-        <div className="flex items-center gap-6 border-b border-[#1e1e22] px-6 py-3">
-          {stats.map((stat) => (
-            <div key={stat.label} className="flex items-center gap-2">
-              {stat.color && (
-                <div
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: stat.color }}
-                />
-              )}
-              <span className="text-xs text-[#555]">{stat.label}</span>
-              <span className="text-sm font-semibold text-white">
-                {stat.value}
-              </span>
-            </div>
-          ))}
-          <div className="ml-auto flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={handleCreateClick}
-              className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              New Task
-            </Button>
-            <div className="mx-1 h-4 w-px bg-[#1e1e22]" />
-            <Clock className="h-3 w-3 text-[#555]" />
-            <span className="text-[10px] text-[#555]">
-              Updated {formatRelativeTime(new Date().toISOString())}
-            </span>
-          </div>
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-[#1e1e22] px-6 py-3">
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-[#555]">
+            {tasks.length} tasks total
+          </span>
         </div>
-
-        {/* Kanban board */}
-        <ScrollArea className="flex-1">
-          <div className="flex gap-4 p-6">
-            {columns.map((col) => (
-              <KanbanColumn
-                key={col.status}
-                status={col.status}
-                label={col.label}
-                dotColor={col.dotColor}
-                tasks={tasks}
-                onEdit={handleEditClick}
-                onStatusChange={handleStatusChange}
-              />
-            ))}
-          </div>
-        </ScrollArea>
+        <Button
+          size="sm"
+          onClick={handleCreateClick}
+          className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          New Task
+        </Button>
       </div>
 
-      {/* Live Activity sidebar */}
-      <LiveActivitySidebar activities={activities} />
+      {/* Kanban board */}
+      <ScrollArea className="flex-1">
+        <div className="flex gap-4 p-6">
+          {columns.map((col) => (
+            <KanbanColumn
+              key={col.status}
+              status={col.status}
+              label={col.label}
+              dotColor={col.dotColor}
+              tasks={tasks}
+              onEdit={handleEditClick}
+              onStatusChange={handleStatusChange}
+              onCreateInColumn={handleCreateClick}
+            />
+          ))}
+        </div>
+      </ScrollArea>
 
-      {/* Task create/edit dialog */}
       <TaskDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
