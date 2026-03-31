@@ -81,20 +81,20 @@ function ProjectDetail({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Back button + header */}
-        <div className="mb-6">
+        <div className="mb-5 md:mb-6">
           <button
             onClick={onBack}
-            className="mb-3 flex items-center gap-1.5 text-xs text-[#a0a0a0] transition-colors hover:text-white"
+            className="mb-3 flex min-h-[44px] items-center gap-1.5 text-sm text-[#a0a0a0] transition-colors hover:text-white active:text-white md:min-h-0 md:text-xs"
           >
-            <ArrowLeft className="h-3 w-3" />
+            <ArrowLeft className="h-4 w-4 md:h-3 md:w-3" />
             Back to Projects
           </button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-xl font-semibold text-white md:text-lg">
                   {project.name}
                 </h2>
                 <Badge
@@ -106,7 +106,7 @@ function ProjectDetail({
                 </Badge>
               </div>
               {project.description && (
-                <p className="mt-1 text-xs text-[#a0a0a0]">
+                <p className="mt-1 text-sm text-[#a0a0a0] md:text-xs">
                   {project.description}
                 </p>
               )}
@@ -115,7 +115,7 @@ function ProjectDetail({
               size="sm"
               variant="ghost"
               onClick={onEditProject}
-              className="text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white"
+              className="h-10 self-start text-sm text-[#b0b0b0] hover:bg-[#252529] hover:text-white md:h-8 md:text-xs"
             >
               Edit Project
             </Button>
@@ -123,30 +123,30 @@ function ProjectDetail({
         </div>
 
         {/* Stats */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
+        <div className="mb-5 grid grid-cols-3 gap-3 md:mb-6 md:gap-4">
           <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
-            <span className="text-[11px] text-[#777]">Backlog</span>
-            <p className="text-lg font-semibold text-white">{backlog}</p>
+            <span className="text-xs text-[#888] md:text-[11px]">Backlog</span>
+            <p className="text-xl font-semibold text-white md:text-lg">{backlog}</p>
           </div>
           <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
-            <span className="text-[11px] text-[#777]">In Progress</span>
-            <p className="text-lg font-semibold text-white">{inProgress}</p>
+            <span className="text-xs text-[#888] md:text-[11px]">In Progress</span>
+            <p className="text-xl font-semibold text-white md:text-lg">{inProgress}</p>
           </div>
           <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
-            <span className="text-[11px] text-[#777]">Done</span>
-            <p className="text-lg font-semibold text-white">{done}</p>
+            <span className="text-xs text-[#888] md:text-[11px]">Done</span>
+            <p className="text-xl font-semibold text-white md:text-lg">{done}</p>
           </div>
         </div>
 
         {/* Progress */}
-        <div className="mb-6">
+        <div className="mb-5 md:mb-6">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-xs text-[#b0b0b0]">Progress</span>
-            <span className="text-xs font-medium text-white">
+            <span className="text-sm text-[#b0b0b0] md:text-xs">Progress</span>
+            <span className="text-sm font-medium text-white md:text-xs">
               {project.progress_percent}%
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[#252529]">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#252529] md:h-2">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -158,18 +158,18 @@ function ProjectDetail({
         </div>
 
         {/* Tasks list */}
-        <div className="mb-6">
+        <div className="mb-5 md:mb-6">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">Tasks</h3>
+            <h3 className="text-base font-semibold text-white md:text-sm">Tasks</h3>
             <Button
               size="sm"
               onClick={() => {
                 setEditingTask(null);
                 setTaskDialogOpen(true);
               }}
-              className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+              className="h-9 gap-1.5 bg-indigo-600 px-4 text-sm text-white hover:bg-indigo-700 md:h-8 md:px-3 md:text-xs"
             >
-              <Plus className="h-3 w-3" />
+              <Plus className="h-4 w-4 md:h-3 md:w-3" />
               Add Task
             </Button>
           </div>
@@ -186,14 +186,14 @@ function ProjectDetail({
                 return (
                   <div
                     key={task.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#252529] bg-[#131316] px-4 py-3 transition-colors hover:border-[#3a3a3e]"
+                    className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[#252529] bg-[#131316] px-3.5 py-3 transition-colors hover:border-[#3a3a3e] active:bg-[#1a1a1e] md:px-4"
                     onClick={() => {
                       setEditingTask(task);
                       setTaskDialogOpen(true);
                     }}
                   >
                     <div
-                      className="h-2 w-2 flex-shrink-0 rounded-full"
+                      className="h-2.5 w-2.5 flex-shrink-0 rounded-full md:h-2 md:w-2"
                       style={{ backgroundColor: priority.color }}
                     />
                     <span className="flex-1 truncate text-sm text-[#f0f0f0]">
@@ -207,7 +207,7 @@ function ProjectDetail({
                     </Badge>
                     {task.agents?.name && (
                       <div
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white md:h-5 md:w-5"
                         style={{ backgroundColor: task.agents.color }}
                       >
                         {task.agents.name[0]}
@@ -217,7 +217,7 @@ function ProjectDetail({
                 );
               })}
               {tasks.length === 0 && (
-                <span className="text-xs text-[#777]">No tasks yet</span>
+                <span className="text-sm text-[#777] md:text-xs">No tasks yet</span>
               )}
             </div>
           )}
@@ -225,23 +225,23 @@ function ProjectDetail({
 
         {/* Recent Activity */}
         <div>
-          <h3 className="mb-3 text-sm font-semibold text-white">
+          <h3 className="mb-3 text-base font-semibold text-white md:text-sm">
             Recent Activity
           </h3>
           <div className="flex flex-col gap-1">
             {activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#131316]"
+                className="flex gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-[#131316] md:py-2"
               >
                 <div
-                  className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white md:h-5 md:w-5 md:text-[10px]"
                   style={{ backgroundColor: activity.agents?.color ?? "#777" }}
                 >
                   {(activity.agents?.name ?? "?")[0]}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-[#a0a0a0]">
+                  <p className="text-sm text-[#a0a0a0] md:text-xs">
                     <span
                       className="font-medium"
                       style={{ color: activity.agents?.color ?? "#777" }}
@@ -251,7 +251,7 @@ function ProjectDetail({
                     {activity.action}{" "}
                     <span className="text-[#ddd]">{activity.description}</span>
                   </p>
-                  <span className="text-[11px] text-[#666]">
+                  <span className="text-xs text-[#666] md:text-[11px]">
                     {formatRelativeTime(activity.created_at)}
                   </span>
                 </div>
@@ -315,12 +315,12 @@ export function ProjectsView() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="mb-6">
           <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#252529]" />
           <div className="h-3 w-48 animate-pulse rounded bg-[#252529]" />
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-48 animate-pulse rounded-xl border border-[#252529] bg-[#131316]" />
           ))}
@@ -331,11 +331,11 @@ export function ProjectsView() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="p-4 md:p-6">
+        <div className="mb-5 flex items-center justify-between md:mb-6">
           <div>
-            <h2 className="text-sm font-semibold text-white">Projects</h2>
-            <p className="mt-0.5 text-xs text-[#777]">
+            <h2 className="text-base font-semibold text-white md:text-sm">Projects</h2>
+            <p className="mt-0.5 text-sm text-[#888] md:text-xs">
               {projects.filter((p) => p.status === "active").length} active ·{" "}
               {projects.length} total
             </p>
@@ -343,28 +343,28 @@ export function ProjectsView() {
           <Button
             size="sm"
             onClick={handleCreateClick}
-            className="gap-1.5 bg-indigo-600 text-xs text-white hover:bg-indigo-700"
+            className="h-9 gap-1.5 bg-indigo-600 px-4 text-sm text-white hover:bg-indigo-700 md:h-8 md:px-3 md:text-xs"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4 md:h-3.5 md:w-3.5" />
             New Project
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 xl:grid-cols-3">
           {projects.map((project) => {
             const status = statusStyles[project.status] ?? statusStyles.active;
             const priority = priorityStyles[project.priority] ?? priorityStyles.medium;
             return (
               <div
                 key={project.id}
-                className="group cursor-pointer rounded-xl border border-[#252529] bg-[#131316] p-5 transition-colors hover:border-[#3a3a3e]"
+                className="group cursor-pointer rounded-xl border border-[#252529] bg-[#131316] p-4 transition-colors hover:border-[#3a3a3e] active:bg-[#1a1a1e] md:p-5"
                 onClick={() => setSelectedProject(project)}
               >
                 {/* Header */}
                 <div className="mb-3 flex items-start justify-between">
                   <div className="flex-1">
                     <div className="mb-1 flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-white">
+                      <h3 className="text-base font-semibold text-white md:text-sm">
                         {project.name}
                       </h3>
                     </div>
@@ -393,7 +393,7 @@ export function ProjectsView() {
                   </div>
                   {project.agents?.name && (
                     <div
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white md:h-7 md:w-7 md:text-[11px]"
                       style={{ backgroundColor: project.agents?.color ?? "#777" }}
                     >
                       {project.agents.name.substring(0, 2).toUpperCase()}
@@ -403,7 +403,7 @@ export function ProjectsView() {
 
                 {/* Description */}
                 {project.description && (
-                  <p className="mb-4 line-clamp-2 text-xs leading-relaxed text-[#a0a0a0]">
+                  <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[#a0a0a0] md:text-xs">
                     {project.description}
                   </p>
                 )}
@@ -411,12 +411,12 @@ export function ProjectsView() {
                 {/* Progress */}
                 <div className="mb-2">
                   <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-[11px] text-[#777]">Progress</span>
-                    <span className="text-[11px] font-medium text-[#b0b0b0]">
+                    <span className="text-xs text-[#888] md:text-[11px]">Progress</span>
+                    <span className="text-xs font-medium text-[#b0b0b0] md:text-[11px]">
                       {project.progress_percent}%
                     </span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#252529]">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-[#252529] md:h-1.5">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
@@ -429,10 +429,10 @@ export function ProjectsView() {
 
                 {/* Task count + last activity */}
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-[#777]">
+                  <span className="text-xs text-[#888] md:text-[11px]">
                     {project.completed_tasks}/{project.total_tasks} tasks
                   </span>
-                  <span className="text-[11px] text-[#666]">
+                  <span className="text-xs text-[#666] md:text-[11px]">
                     {formatRelativeTime(project.updated_at)}
                   </span>
                 </div>

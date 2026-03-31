@@ -122,7 +122,7 @@ export function CronsView() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="mb-6">
           <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#252529]" />
           <div className="h-3 w-48 animate-pulse rounded bg-[#252529]" />
@@ -138,29 +138,29 @@ export function CronsView() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-white">Cron Jobs</h2>
-          <p className="mt-0.5 text-xs text-[#777]">
+        <div className="mb-5 md:mb-6">
+          <h2 className="text-base font-semibold text-white md:text-sm">Cron Jobs</h2>
+          <p className="mt-0.5 text-sm text-[#888] md:text-xs">
             {cronJobs.length} jobs configured
           </p>
         </div>
 
         {/* Stats */}
-        <div className="mb-6 flex gap-4">
-          <div className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2">
-            <div className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="text-xs text-[#e0e0e0]">{activeCount} active</span>
+        <div className="mb-5 flex flex-wrap gap-2.5 md:mb-6 md:gap-4">
+          <div className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2 md:min-h-0">
+            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 md:h-2 md:w-2" />
+            <span className="text-sm text-[#e0e0e0] md:text-xs">{activeCount} active</span>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2">
-            <div className="h-2 w-2 rounded-full bg-[#555]" />
-            <span className="text-xs text-[#e0e0e0]">{disabledCount} disabled</span>
+          <div className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2 md:min-h-0">
+            <div className="h-2.5 w-2.5 rounded-full bg-[#555] md:h-2 md:w-2" />
+            <span className="text-sm text-[#e0e0e0] md:text-xs">{disabledCount} disabled</span>
           </div>
           {errorCount > 0 && (
-            <div className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2">
-              <div className="h-2 w-2 rounded-full bg-red-500" />
-              <span className="text-xs text-[#e0e0e0]">{errorCount} errors</span>
+            <div className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#111113] px-3 py-2 md:min-h-0">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-500 md:h-2 md:w-2" />
+              <span className="text-sm text-[#e0e0e0] md:text-xs">{errorCount} errors</span>
             </div>
           )}
         </div>
@@ -177,7 +177,7 @@ export function CronsView() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`h-2 w-2 flex-shrink-0 rounded-full ${
+                      className={`h-2.5 w-2.5 flex-shrink-0 rounded-full md:h-2 md:w-2 ${
                         !job.enabled
                           ? "bg-[#555]"
                           : job.last_status === "error"
@@ -192,13 +192,13 @@ export function CronsView() {
                     </span>
                   </div>
                   {job.description && (
-                    <p className="mt-1 line-clamp-2 text-xs text-[#777]">
+                    <p className="mt-1 line-clamp-2 text-sm text-[#888] md:text-xs">
                       {job.description}
                     </p>
                   )}
                 </div>
                 <span
-                  className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                  className={`flex-shrink-0 rounded px-2 py-1 text-[11px] font-medium md:px-1.5 md:py-0.5 md:text-[10px] ${
                     job.enabled
                       ? "bg-emerald-500/10 text-emerald-400"
                       : "bg-[#252529] text-[#666]"
@@ -209,23 +209,23 @@ export function CronsView() {
               </div>
 
               {/* Schedule */}
-              <div className="mb-3 text-xs text-[#b0b0b0]">
+              <div className="mb-3 text-sm text-[#b0b0b0] md:text-xs">
                 {formatSchedule(job.schedule)}
               </div>
 
               {/* Model badge */}
               {job.model && (
                 <div className="mb-3">
-                  <span className="rounded bg-[#252529] px-1.5 py-0.5 text-[10px] font-medium text-[#a0a0a0]">
+                  <span className="rounded bg-[#252529] px-2 py-0.5 text-[11px] font-medium text-[#a0a0a0] md:px-1.5 md:text-[10px]">
                     {job.model}
                   </span>
                 </div>
               )}
 
               {/* Last run info */}
-              <div className="flex flex-col gap-1 border-t border-[#1e1e22] pt-2.5">
+              <div className="flex flex-col gap-1.5 border-t border-[#1e1e22] pt-2.5 md:gap-1">
                 {job.last_run_at ? (
-                  <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center justify-between text-xs md:text-[11px]">
                     <span className="text-[#666]">Last run</span>
                     <span className="text-[#a0a0a0]">
                       {formatRelativeTime(job.last_run_at)}
@@ -235,11 +235,11 @@ export function CronsView() {
                     </span>
                   </div>
                 ) : (
-                  <div className="text-[11px] text-[#666]">Never run</div>
+                  <div className="text-xs text-[#666] md:text-[11px]">Never run</div>
                 )}
 
                 {job.next_run_at && job.enabled && (
-                  <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center justify-between text-xs md:text-[11px]">
                     <span className="text-[#666]">Next run</span>
                     <span className="text-[#a0a0a0]">
                       {formatFutureRelativeTime(job.next_run_at)}
@@ -250,12 +250,12 @@ export function CronsView() {
 
               {/* Error display */}
               {job.last_status === "error" && job.last_error && (
-                <div className="mt-2 rounded bg-red-500/5 px-2 py-1.5">
-                  <p className="line-clamp-2 text-[11px] text-red-400">
+                <div className="mt-2 rounded bg-red-500/5 px-2.5 py-2 md:px-2 md:py-1.5">
+                  <p className="line-clamp-2 text-xs text-red-400 md:text-[11px]">
                     {job.last_error}
                   </p>
                   {job.consecutive_errors > 1 && (
-                    <p className="mt-0.5 text-[10px] text-red-400/60">
+                    <p className="mt-0.5 text-[11px] text-red-400/60 md:text-[10px]">
                       {job.consecutive_errors} consecutive errors
                     </p>
                   )}
@@ -267,7 +267,7 @@ export function CronsView() {
 
         {cronJobs.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-xs text-[#777]">No cron jobs configured</p>
+            <p className="text-sm text-[#777] md:text-xs">No cron jobs configured</p>
           </div>
         )}
       </div>

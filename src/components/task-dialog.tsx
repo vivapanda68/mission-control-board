@@ -179,7 +179,7 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#252529] bg-[#131316] text-[#f0f0f0] sm:max-w-[480px]">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto border-[#252529] bg-[#131316] text-[#f0f0f0] sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold text-white">
             {isEditing ? "Edit Task" : "Create Task"}
