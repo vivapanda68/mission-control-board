@@ -179,7 +179,7 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#1e1e22] bg-[#111113] text-[#e0e0e0] sm:max-w-[480px]">
+      <DialogContent className="border-[#252529] bg-[#131316] text-[#f0f0f0] sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold text-white">
             {isEditing ? "Edit Task" : "Create Task"}
@@ -189,38 +189,38 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
         <div className="flex flex-col gap-4 pt-2">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-[#999]">Title *</Label>
+            <Label className="text-xs text-[#b0b0b0]">Title *</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
-              className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] placeholder:text-[#444] focus-visible:ring-1 focus-visible:ring-[#333]"
+              className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] placeholder:text-[#666] focus-visible:ring-1 focus-visible:ring-[#444]"
             />
           </div>
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-[#999]">Description</Label>
+            <Label className="text-xs text-[#b0b0b0]">Description</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Task description"
               rows={3}
-              className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] placeholder:text-[#444] focus-visible:ring-1 focus-visible:ring-[#333] resize-none"
+              className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] placeholder:text-[#666] focus-visible:ring-1 focus-visible:ring-[#444] resize-none"
             />
           </div>
 
           {/* Status & Priority row */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Status</Label>
+              <Label className="text-xs text-[#b0b0b0]">Status</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
+                <SelectContent className="border-[#252529] bg-[#131316]">
                   {statusOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -228,14 +228,14 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Priority</Label>
+              <Label className="text-xs text-[#b0b0b0]">Priority</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
+                <SelectContent className="border-[#252529] bg-[#131316]">
                   {priorityOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -247,17 +247,17 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
           {/* Assignee & Project row */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Assignee</Label>
+              <Label className="text-xs text-[#b0b0b0]">Assignee</Label>
               <Select value={assigneeId} onValueChange={setAssigneeId}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue placeholder="Unassigned" />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
-                  <SelectItem value="none" className="text-sm text-[#666] focus:bg-[#1e1e22] focus:text-white">
+                <SelectContent className="border-[#252529] bg-[#131316]">
+                  <SelectItem value="none" className="text-sm text-[#777] focus:bg-[#252529] focus:text-white">
                     Unassigned
                   </SelectItem>
                   {agents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={agent.id} value={agent.id} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       <div className="flex items-center gap-2">
                         <div
                           className="h-2 w-2 rounded-full"
@@ -271,17 +271,17 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Project</Label>
+              <Label className="text-xs text-[#b0b0b0]">Project</Label>
               <Select value={projectId} onValueChange={setProjectId}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue placeholder="No project" />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
-                  <SelectItem value="none" className="text-sm text-[#666] focus:bg-[#1e1e22] focus:text-white">
+                <SelectContent className="border-[#252529] bg-[#131316]">
+                  <SelectItem value="none" className="text-sm text-[#777] focus:bg-[#252529] focus:text-white">
                     No project
                   </SelectItem>
                   {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={project.id} value={project.id} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       {project.name}
                     </SelectItem>
                   ))}
@@ -305,15 +305,15 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
                     <span className="text-xs">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="border-[#1e1e22] bg-[#111113]">
+                <AlertDialogContent className="border-[#252529] bg-[#131316]">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-sm text-white">Delete task?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-xs text-[#999]">
+                    <AlertDialogDescription className="text-xs text-[#b0b0b0]">
                       This will permanently delete &quot;{task?.title}&quot;. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="border-[#1e1e22] bg-[#0a0a0b] text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white">
+                    <AlertDialogCancel className="border-[#252529] bg-[#0a0a0b] text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white">
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
@@ -333,7 +333,7 @@ export function TaskDialog({ open, onOpenChange, task, onSaved }: TaskDialogProp
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenChange(false)}
-                className="text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+                className="text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white"
                 disabled={saving}
               >
                 Cancel

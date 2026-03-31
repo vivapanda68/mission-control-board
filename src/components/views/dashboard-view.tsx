@@ -23,7 +23,7 @@ import { TaskDialog } from "@/components/task-dialog";
 function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded bg-[#1e1e22] ${className ?? ""}`}
+      className={`animate-pulse rounded bg-[#252529] ${className ?? ""}`}
     />
   );
 }
@@ -41,12 +41,12 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-[#1e1e22] bg-[#111113] p-4 transition-colors hover:border-[#2a2a2e]">
+    <div className="rounded-xl border border-[#252529] bg-[#131316] p-4 transition-colors hover:border-[#3a3a3e]">
       <div className="mb-3 flex items-center gap-2">
         <Icon className="h-4 w-4" style={{ color }} />
-        <span className="text-xs text-[#666]">{label}</span>
+        <span className="text-xs text-[#777]">{label}</span>
       </div>
-      <span className="text-2xl font-semibold text-white">{value}</span>
+      <span className="text-3xl font-bold text-white">{value}</span>
     </div>
   );
 }
@@ -91,7 +91,7 @@ function SprintSection({
 
     return (
       <div
-        className="group flex cursor-pointer items-center gap-3 rounded-lg border border-[#1e1e22] bg-[#111113] px-4 py-3 transition-colors hover:border-[#2a2a2e]"
+        className="group flex cursor-pointer items-center gap-3 rounded-lg border border-[#252529] bg-[#131316] px-4 py-3 transition-colors hover:border-[#3a3a3e]"
         onClick={() => onEditTask(task)}
       >
         <div
@@ -100,13 +100,13 @@ function SprintSection({
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium text-[#e0e0e0]">
+            <span className="truncate text-sm font-medium text-[#f0f0f0]">
               {task.title}
             </span>
             {project && (
               <Badge
                 variant="outline"
-                className="border-transparent px-1.5 py-0 text-[9px] text-[#888] bg-[#1e1e22]"
+                className="border-transparent px-1.5 py-0 text-[11px] text-[#a0a0a0] bg-[#252529]"
               >
                 {project.name}
               </Badge>
@@ -115,7 +115,7 @@ function SprintSection({
         </div>
         {agent && (
           <div
-            className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+            className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
             style={{ backgroundColor: agent.color }}
           >
             {agent.name[0]}
@@ -131,15 +131,15 @@ function SprintSection({
       <div>
         <div className="mb-3 flex items-center gap-2">
           <Loader2 className="h-3.5 w-3.5 text-emerald-500" />
-          <span className="text-xs font-medium text-[#999]">In Progress</span>
-          <span className="text-xs text-[#444]">{inProgress.length}</span>
+          <span className="text-xs font-medium text-[#b0b0b0]">In Progress</span>
+          <span className="text-xs text-[#666]">{inProgress.length}</span>
         </div>
         <div className="flex flex-col gap-2">
           {inProgress.map((task) => (
             <TaskRow key={task.id} task={task} />
           ))}
           {inProgress.length === 0 && (
-            <span className="text-xs text-[#555]">No tasks in progress</span>
+            <span className="text-xs text-[#777]">No tasks in progress</span>
           )}
         </div>
       </div>
@@ -148,15 +148,15 @@ function SprintSection({
       <div>
         <div className="mb-3 flex items-center gap-2">
           <CheckCircle2 className="h-3.5 w-3.5 text-amber-500" />
-          <span className="text-xs font-medium text-[#999]">In Review</span>
-          <span className="text-xs text-[#444]">{inReview.length}</span>
+          <span className="text-xs font-medium text-[#b0b0b0]">In Review</span>
+          <span className="text-xs text-[#666]">{inReview.length}</span>
         </div>
         <div className="flex flex-col gap-2">
           {inReview.map((task) => (
             <TaskRow key={task.id} task={task} />
           ))}
           {inReview.length === 0 && (
-            <span className="text-xs text-[#555]">No tasks in review</span>
+            <span className="text-xs text-[#777]">No tasks in review</span>
           )}
         </div>
       </div>
@@ -171,33 +171,33 @@ function ActivityFeed({ activities }: { activities: Activity[] }) {
       {activities.map((activity) => (
         <div
           key={activity.id}
-          className="group flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#0a0a0b]"
+          className="group flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#131316]"
         >
           <div
-            className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white"
-            style={{ backgroundColor: activity.agents?.color ?? "#666" }}
+            className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+            style={{ backgroundColor: activity.agents?.color ?? "#777" }}
           >
             {(activity.agents?.name ?? "?")[0]}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs leading-relaxed text-[#888]">
+            <p className="text-xs leading-relaxed text-[#a0a0a0]">
               <span
                 className="font-medium"
-                style={{ color: activity.agents?.color ?? "#666" }}
+                style={{ color: activity.agents?.color ?? "#777" }}
               >
                 {activity.agents?.name ?? "System"}
               </span>{" "}
               {activity.action}{" "}
-              <span className="text-[#ccc]">{activity.description}</span>
+              <span className="text-[#ddd]">{activity.description}</span>
             </p>
-            <span className="text-[10px] text-[#444]">
+            <span className="text-[11px] text-[#666]">
               {formatRelativeTime(activity.created_at)}
             </span>
           </div>
         </div>
       ))}
       {activities.length === 0 && (
-        <span className="px-2 text-xs text-[#555]">No recent activity</span>
+        <span className="px-2 text-xs text-[#777]">No recent activity</span>
       )}
     </div>
   );
@@ -205,10 +205,10 @@ function ActivityFeed({ activities }: { activities: Activity[] }) {
 
 // --- Project Health ---
 const statusStyles: Record<string, { color: string; bg: string }> = {
-  active: { color: "#10b981", bg: "#10b98118" },
-  paused: { color: "#f59e0b", bg: "#f59e0b18" },
-  completed: { color: "#6366f1", bg: "#6366f118" },
-  planning: { color: "#8b5cf6", bg: "#8b5cf618" },
+  active: { color: "#10b981", bg: "#10b98125" },
+  paused: { color: "#f59e0b", bg: "#f59e0b25" },
+  completed: { color: "#6366f1", bg: "#6366f125" },
+  planning: { color: "#8b5cf6", bg: "#8b5cf625" },
 };
 
 function ProjectHealth({ projects }: { projects: Project[] }) {
@@ -223,7 +223,7 @@ function ProjectHealth({ projects }: { projects: Project[] }) {
         return (
           <div
             key={project.id}
-            className="rounded-xl border border-[#1e1e22] bg-[#111113] p-4 transition-colors hover:border-[#2a2a2e]"
+            className="rounded-xl border border-[#252529] bg-[#131316] p-4 transition-colors hover:border-[#3a3a3e]"
           >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-white">
@@ -231,14 +231,14 @@ function ProjectHealth({ projects }: { projects: Project[] }) {
               </span>
               <Badge
                 variant="outline"
-                className="border-transparent px-1.5 py-0 text-[9px] capitalize"
+                className="border-transparent px-1.5 py-0 text-[11px] capitalize"
                 style={{ backgroundColor: status.bg, color: status.color }}
               >
                 {project.status}
               </Badge>
             </div>
             <div className="mb-2">
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#1e1e22]">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#252529]">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -249,10 +249,10 @@ function ProjectHealth({ projects }: { projects: Project[] }) {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-[#555]">
+              <span className="text-[11px] text-[#777]">
                 {project.completed_tasks}/{project.total_tasks} tasks
               </span>
-              <span className="text-[10px] text-[#555]">
+              <span className="text-[11px] text-[#777]">
                 {project.progress_percent}%
               </span>
             </div>
@@ -260,7 +260,7 @@ function ProjectHealth({ projects }: { projects: Project[] }) {
         );
       })}
       {active.length === 0 && (
-        <span className="text-xs text-[#555]">No active projects</span>
+        <span className="text-xs text-[#777]">No active projects</span>
       )}
     </div>
   );
@@ -333,7 +333,7 @@ export function DashboardView() {
           </div>
           <div className="mb-8 grid grid-cols-2 gap-4 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-[#1e1e22] bg-[#111113] p-4">
+              <div key={i} className="rounded-xl border border-[#252529] bg-[#131316] p-4">
                 <SkeletonPulse className="mb-3 h-4 w-20" />
                 <SkeletonPulse className="h-7 w-12" />
               </div>
@@ -401,7 +401,7 @@ export function DashboardView() {
               <h2 className="text-sm font-semibold text-white">
                 Current Sprint
               </h2>
-              <p className="mt-0.5 text-xs text-[#555]">
+              <p className="mt-0.5 text-xs text-[#777]">
                 Active and review tasks sorted by priority
               </p>
             </div>
@@ -414,10 +414,10 @@ export function DashboardView() {
 
           {/* Right: Activity Feed */}
           <div className="xl:col-span-2">
-            <div className="rounded-xl border border-[#1e1e22] bg-[#111113] p-5">
+            <div className="rounded-xl border border-[#252529] bg-[#131316] p-5">
               <div className="mb-4 flex items-center gap-2">
                 <Zap className="h-4 w-4 text-emerald-500" />
-                <h3 className="text-xs font-medium text-[#999]">
+                <h3 className="text-xs font-medium text-[#b0b0b0]">
                   Recent Activity
                 </h3>
                 <div className="ml-auto h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
@@ -433,7 +433,7 @@ export function DashboardView() {
             <h2 className="text-sm font-semibold text-white">
               Project Health
             </h2>
-            <p className="mt-0.5 text-xs text-[#555]">
+            <p className="mt-0.5 text-xs text-[#777]">
               Active and planning projects at a glance
             </p>
           </div>

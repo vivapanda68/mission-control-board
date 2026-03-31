@@ -89,16 +89,16 @@ export function ActivityView() {
     return (
       <div className="p-6">
         <div className="mb-6">
-          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#1e1e22]" />
-          <div className="h-3 w-48 animate-pulse rounded bg-[#1e1e22]" />
+          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#252529]" />
+          <div className="h-3 w-48 animate-pulse rounded bg-[#252529]" />
         </div>
         <div className="flex flex-col gap-3">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="flex gap-3">
-              <div className="h-7 w-7 animate-pulse rounded-full bg-[#1e1e22]" />
+              <div className="h-7 w-7 animate-pulse rounded-full bg-[#252529]" />
               <div className="flex-1">
-                <div className="mb-1 h-3 w-3/4 animate-pulse rounded bg-[#1e1e22]" />
-                <div className="h-2 w-20 animate-pulse rounded bg-[#1e1e22]" />
+                <div className="mb-1 h-3 w-3/4 animate-pulse rounded bg-[#252529]" />
+                <div className="h-2 w-20 animate-pulse rounded bg-[#252529]" />
               </div>
             </div>
           ))}
@@ -114,24 +114,24 @@ export function ActivityView() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-white">Activity Log</h2>
-            <p className="mt-0.5 text-xs text-[#555]">
+            <p className="mt-0.5 text-xs text-[#777]">
               {filtered.length} activities
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Select value={filterAgent} onValueChange={setFilterAgent}>
-              <SelectTrigger className="w-[140px] border-[#1e1e22] bg-[#111113] text-xs text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+              <SelectTrigger className="w-[140px] border-[#252529] bg-[#131316] text-xs text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                 <SelectValue placeholder="All agents" />
               </SelectTrigger>
-              <SelectContent className="border-[#1e1e22] bg-[#111113]">
-                <SelectItem value="all" className="text-xs text-[#999] focus:bg-[#1e1e22] focus:text-white">
+              <SelectContent className="border-[#252529] bg-[#131316]">
+                <SelectItem value="all" className="text-xs text-[#b0b0b0] focus:bg-[#252529] focus:text-white">
                   All agents
                 </SelectItem>
                 {agents.map((agent) => (
                   <SelectItem
                     key={agent.id}
                     value={agent.id}
-                    className="text-xs text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white"
+                    className="text-xs text-[#f0f0f0] focus:bg-[#252529] focus:text-white"
                   >
                     <div className="flex items-center gap-2">
                       <div
@@ -146,18 +146,18 @@ export function ActivityView() {
             </Select>
 
             <Select value={filterProject} onValueChange={setFilterProject}>
-              <SelectTrigger className="w-[140px] border-[#1e1e22] bg-[#111113] text-xs text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+              <SelectTrigger className="w-[140px] border-[#252529] bg-[#131316] text-xs text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                 <SelectValue placeholder="All projects" />
               </SelectTrigger>
-              <SelectContent className="border-[#1e1e22] bg-[#111113]">
-                <SelectItem value="all" className="text-xs text-[#999] focus:bg-[#1e1e22] focus:text-white">
+              <SelectContent className="border-[#252529] bg-[#131316]">
+                <SelectItem value="all" className="text-xs text-[#b0b0b0] focus:bg-[#252529] focus:text-white">
                   All projects
                 </SelectItem>
                 {projects.map((project) => (
                   <SelectItem
                     key={project.id}
                     value={project.id}
-                    className="text-xs text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white"
+                    className="text-xs text-[#f0f0f0] focus:bg-[#252529] focus:text-white"
                   >
                     {project.name}
                   </SelectItem>
@@ -172,39 +172,39 @@ export function ActivityView() {
           {Array.from(grouped.entries()).map(([date, dateActivities]) => (
             <div key={date}>
               <div className="mb-3 flex items-center gap-3">
-                <span className="text-xs font-medium text-[#999]">{date}</span>
-                <div className="h-px flex-1 bg-[#1e1e22]" />
+                <span className="text-xs font-medium text-[#b0b0b0]">{date}</span>
+                <div className="h-px flex-1 bg-[#252529]" />
               </div>
               <div className="flex flex-col gap-1">
                 {dateActivities.map((activity) => (
                   <div
                     key={activity.id}
-                    className="group flex gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-[#111113]"
+                    className="group flex gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-[#131316]"
                   >
                     <div
-                      className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                      className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
                       style={{
-                        backgroundColor: activity.agents?.color ?? "#666",
+                        backgroundColor: activity.agents?.color ?? "#777",
                       }}
                     >
                       {(activity.agents?.name ?? "?")[0]}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs leading-relaxed text-[#888]">
+                      <p className="text-xs leading-relaxed text-[#a0a0a0]">
                         <span
                           className="font-medium"
                           style={{
-                            color: activity.agents?.color ?? "#666",
+                            color: activity.agents?.color ?? "#777",
                           }}
                         >
                           {activity.agents?.name ?? "System"}
                         </span>{" "}
                         {activity.action}{" "}
-                        <span className="text-[#ccc]">
+                        <span className="text-[#ddd]">
                           {activity.description}
                         </span>
                       </p>
-                      <span className="text-[10px] text-[#444]">
+                      <span className="text-[11px] text-[#666]">
                         {formatRelativeTime(activity.created_at)}
                       </span>
                     </div>
@@ -215,7 +215,7 @@ export function ActivityView() {
           ))}
 
           {filtered.length === 0 && (
-            <span className="text-xs text-[#555]">No activities found</span>
+            <span className="text-xs text-[#777]">No activities found</span>
           )}
         </div>
 
@@ -226,7 +226,7 @@ export function ActivityView() {
               variant="ghost"
               size="sm"
               onClick={() => setLimit((prev) => prev + 50)}
-              className="text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+              className="text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white"
             >
               Load more
             </Button>

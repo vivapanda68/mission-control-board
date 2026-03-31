@@ -19,7 +19,7 @@ import { TaskDialog } from "@/components/task-dialog";
 type TaskStatus = "backlog" | "in_progress" | "review" | "done";
 
 const columns: { status: TaskStatus; label: string; dotColor: string }[] = [
-  { status: "backlog", label: "To Do", dotColor: "#666" },
+  { status: "backlog", label: "To Do", dotColor: "#888" },
   { status: "in_progress", label: "In Progress", dotColor: "#10b981" },
   { status: "review", label: "Review", dotColor: "#f59e0b" },
   { status: "done", label: "Done", dotColor: "#06b6d4" },
@@ -49,19 +49,19 @@ function TaskCard({
 }) {
   return (
     <div
-      className="group cursor-pointer rounded-lg border border-[#1e1e22] bg-[#111113] p-3 transition-colors hover:border-[#2a2a2e]"
+      className="group cursor-pointer rounded-lg border border-[#252529] bg-[#131316] p-3 transition-colors hover:border-[#3a3a3e]"
       onClick={() => onEdit(task)}
     >
       <div className="mb-2 flex items-start justify-between">
         <div className="flex items-center gap-2">
           <div
             className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: priorityColors[task.priority] ?? "#666" }}
+            style={{ backgroundColor: priorityColors[task.priority] ?? "#777" }}
           />
           {task.projects?.name && (
             <Badge
               variant="outline"
-              className="border-transparent bg-[#1e1e22] px-1.5 py-0 text-[9px] text-[#888]"
+              className="border-transparent bg-[#252529] px-1.5 py-0 text-[11px] text-[#a0a0a0]"
             >
               {task.projects.name}
             </Badge>
@@ -72,7 +72,7 @@ function TaskCard({
             <Button
               variant="ghost"
               size="icon-xs"
-              className="opacity-0 group-hover:opacity-100 text-[#555] hover:text-white"
+              className="opacity-0 group-hover:opacity-100 text-[#777] hover:text-white"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreHorizontal className="h-3 w-3" />
@@ -80,26 +80,26 @@ function TaskCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="border-[#1e1e22] bg-[#111113]"
+            className="border-[#252529] bg-[#131316]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-2 py-1.5">
-              <span className="text-[10px] font-medium text-[#555]">Move to</span>
+              <span className="text-[11px] font-medium text-[#777]">Move to</span>
             </div>
             {allStatuses
               .filter((s) => s.value !== task.status)
               .map((s) => (
                 <DropdownMenuItem
                   key={s.value}
-                  className="text-xs text-[#999] focus:bg-[#1e1e22] focus:text-white"
+                  className="text-xs text-[#b0b0b0] focus:bg-[#252529] focus:text-white"
                   onClick={() => onStatusChange(task, s.value)}
                 >
                   {s.label}
                 </DropdownMenuItem>
               ))}
-            <DropdownMenuSeparator className="bg-[#1e1e22]" />
+            <DropdownMenuSeparator className="bg-[#252529]" />
             <DropdownMenuItem
-              className="text-xs text-[#999] focus:bg-[#1e1e22] focus:text-white"
+              className="text-xs text-[#b0b0b0] focus:bg-[#252529] focus:text-white"
               onClick={() => onEdit(task)}
             >
               Edit
@@ -107,19 +107,19 @@ function TaskCard({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <h4 className="mb-1 text-[13px] font-medium text-[#e0e0e0]">
+      <h4 className="mb-1 text-sm font-medium text-[#f0f0f0]">
         {task.title}
       </h4>
       {task.description && (
-        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-[#666]">
+        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-[#777]">
           {task.description}
         </p>
       )}
       <div className="flex items-center justify-end gap-1.5">
         {task.agents?.name && (
           <div
-            className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white"
-            style={{ backgroundColor: task.agents?.color ?? "#666" }}
+            className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
+            style={{ backgroundColor: task.agents?.color ?? "#777" }}
           >
             {task.agents.name[0]}
           </div>
@@ -186,12 +186,12 @@ function KanbanColumn({
           className="h-2 w-2 rounded-full"
           style={{ backgroundColor: dotColor }}
         />
-        <span className="text-xs font-medium text-[#999]">{label}</span>
-        <span className="text-xs text-[#444]">{columnTasks.length}</span>
+        <span className="text-xs font-medium text-[#b0b0b0]">{label}</span>
+        <span className="text-xs text-[#666]">{columnTasks.length}</span>
         <Button
           variant="ghost"
           size="icon-xs"
-          className="ml-auto text-[#555] hover:text-white"
+          className="ml-auto text-[#777] hover:text-white"
           onClick={onCreateInColumn}
         >
           <Plus className="h-3 w-3" />
@@ -205,10 +205,10 @@ function KanbanColumn({
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: "#6366f1" }}
               />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#777]">
                 {projectName}
               </span>
-              <span className="text-[10px] text-[#333]">{projectTasks.length}</span>
+              <span className="text-[11px] text-[#666]">{projectTasks.length}</span>
             </div>
             <div className="flex flex-col gap-2">
               {projectTasks.map((task) => (
@@ -225,11 +225,11 @@ function KanbanColumn({
         {noProject.length > 0 && (
           <div>
             <div className="mb-1.5 flex items-center gap-1.5 px-1">
-              <div className="h-1.5 w-1.5 rounded-full bg-[#333]" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#555]">
+              <div className="h-1.5 w-1.5 rounded-full bg-[#555]" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#777]">
                 Unassigned
               </span>
-              <span className="text-[10px] text-[#333]">{noProject.length}</span>
+              <span className="text-[11px] text-[#666]">{noProject.length}</span>
             </div>
             <div className="flex flex-col gap-2">
               {noProject.map((task) => (
@@ -299,17 +299,17 @@ export function TasksView() {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <div className="flex items-center gap-6 border-b border-[#1e1e22] px-6 py-3">
+        <div className="flex items-center gap-6 border-b border-[#252529] px-6 py-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#1e1e22]" />
+            <div key={i} className="h-4 w-24 animate-pulse rounded bg-[#252529]" />
           ))}
         </div>
         <div className="flex gap-4 p-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex min-w-[260px] flex-1 flex-col gap-2">
-              <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#1e1e22]" />
+              <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#252529]" />
               {Array.from({ length: 3 }).map((_, j) => (
-                <div key={j} className="h-24 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+                <div key={j} className="h-24 animate-pulse rounded-lg border border-[#252529] bg-[#131316]" />
               ))}
             </div>
           ))}
@@ -321,9 +321,9 @@ export function TasksView() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#1e1e22] px-6 py-3">
+      <div className="flex items-center justify-between border-b border-[#252529] px-6 py-3">
         <div className="flex items-center gap-4">
-          <span className="text-xs text-[#555]">
+          <span className="text-xs text-[#777]">
             {tasks.length} tasks total
           </span>
         </div>

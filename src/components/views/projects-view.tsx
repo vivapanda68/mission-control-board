@@ -11,10 +11,10 @@ import { TaskDialog } from "@/components/task-dialog";
 import { formatRelativeTime } from "@/lib/format";
 
 const statusStyles: Record<string, { color: string; bg: string }> = {
-  active: { color: "#10b981", bg: "#10b98118" },
-  paused: { color: "#f59e0b", bg: "#f59e0b18" },
-  completed: { color: "#6366f1", bg: "#6366f118" },
-  planning: { color: "#8b5cf6", bg: "#8b5cf618" },
+  active: { color: "#10b981", bg: "#10b98125" },
+  paused: { color: "#f59e0b", bg: "#f59e0b25" },
+  completed: { color: "#6366f1", bg: "#6366f125" },
+  planning: { color: "#8b5cf6", bg: "#8b5cf625" },
 };
 
 const priorityStyles: Record<string, { color: string; label: string }> = {
@@ -86,7 +86,7 @@ function ProjectDetail({
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="mb-3 flex items-center gap-1.5 text-xs text-[#888] transition-colors hover:text-white"
+            className="mb-3 flex items-center gap-1.5 text-xs text-[#a0a0a0] transition-colors hover:text-white"
           >
             <ArrowLeft className="h-3 w-3" />
             Back to Projects
@@ -99,14 +99,14 @@ function ProjectDetail({
                 </h2>
                 <Badge
                   variant="outline"
-                  className="border-transparent px-1.5 py-0 text-[10px] capitalize"
+                  className="border-transparent px-1.5 py-0 text-[11px] capitalize"
                   style={{ backgroundColor: status.bg, color: status.color }}
                 >
                   {project.status}
                 </Badge>
               </div>
               {project.description && (
-                <p className="mt-1 text-xs text-[#888]">
+                <p className="mt-1 text-xs text-[#a0a0a0]">
                   {project.description}
                 </p>
               )}
@@ -115,7 +115,7 @@ function ProjectDetail({
               size="sm"
               variant="ghost"
               onClick={onEditProject}
-              className="text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+              className="text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white"
             >
               Edit Project
             </Button>
@@ -124,16 +124,16 @@ function ProjectDetail({
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-3 gap-4">
-          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
-            <span className="text-[10px] text-[#555]">Backlog</span>
+          <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
+            <span className="text-[11px] text-[#777]">Backlog</span>
             <p className="text-lg font-semibold text-white">{backlog}</p>
           </div>
-          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
-            <span className="text-[10px] text-[#555]">In Progress</span>
+          <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
+            <span className="text-[11px] text-[#777]">In Progress</span>
             <p className="text-lg font-semibold text-white">{inProgress}</p>
           </div>
-          <div className="rounded-lg border border-[#1e1e22] bg-[#111113] p-3">
-            <span className="text-[10px] text-[#555]">Done</span>
+          <div className="rounded-lg border border-[#252529] bg-[#131316] p-3">
+            <span className="text-[11px] text-[#777]">Done</span>
             <p className="text-lg font-semibold text-white">{done}</p>
           </div>
         </div>
@@ -141,12 +141,12 @@ function ProjectDetail({
         {/* Progress */}
         <div className="mb-6">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-xs text-[#999]">Progress</span>
+            <span className="text-xs text-[#b0b0b0]">Progress</span>
             <span className="text-xs font-medium text-white">
               {project.progress_percent}%
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[#1e1e22]">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#252529]">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -176,7 +176,7 @@ function ProjectDetail({
           {loading ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-12 animate-pulse rounded-lg border border-[#1e1e22] bg-[#111113]" />
+                <div key={i} className="h-12 animate-pulse rounded-lg border border-[#252529] bg-[#131316]" />
               ))}
             </div>
           ) : (
@@ -186,7 +186,7 @@ function ProjectDetail({
                 return (
                   <div
                     key={task.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#1e1e22] bg-[#111113] px-4 py-3 transition-colors hover:border-[#2a2a2e]"
+                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#252529] bg-[#131316] px-4 py-3 transition-colors hover:border-[#3a3a3e]"
                     onClick={() => {
                       setEditingTask(task);
                       setTaskDialogOpen(true);
@@ -196,18 +196,18 @@ function ProjectDetail({
                       className="h-2 w-2 flex-shrink-0 rounded-full"
                       style={{ backgroundColor: priority.color }}
                     />
-                    <span className="flex-1 truncate text-sm text-[#e0e0e0]">
+                    <span className="flex-1 truncate text-sm text-[#f0f0f0]">
                       {task.title}
                     </span>
                     <Badge
                       variant="outline"
-                      className="border-transparent bg-[#1e1e22] px-1.5 py-0 text-[9px] capitalize text-[#888]"
+                      className="border-transparent bg-[#252529] px-1.5 py-0 text-[11px] capitalize text-[#a0a0a0]"
                     >
                       {task.status.replace("_", " ")}
                     </Badge>
                     {task.agents?.name && (
                       <div
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white"
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
                         style={{ backgroundColor: task.agents.color }}
                       >
                         {task.agents.name[0]}
@@ -217,7 +217,7 @@ function ProjectDetail({
                 );
               })}
               {tasks.length === 0 && (
-                <span className="text-xs text-[#555]">No tasks yet</span>
+                <span className="text-xs text-[#777]">No tasks yet</span>
               )}
             </div>
           )}
@@ -232,26 +232,26 @@ function ProjectDetail({
             {activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#111113]"
+                className="flex gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#131316]"
               >
                 <div
-                  className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white"
-                  style={{ backgroundColor: activity.agents?.color ?? "#666" }}
+                  className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  style={{ backgroundColor: activity.agents?.color ?? "#777" }}
                 >
                   {(activity.agents?.name ?? "?")[0]}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-[#888]">
+                  <p className="text-xs text-[#a0a0a0]">
                     <span
                       className="font-medium"
-                      style={{ color: activity.agents?.color ?? "#666" }}
+                      style={{ color: activity.agents?.color ?? "#777" }}
                     >
                       {activity.agents?.name ?? "System"}
                     </span>{" "}
                     {activity.action}{" "}
-                    <span className="text-[#ccc]">{activity.description}</span>
+                    <span className="text-[#ddd]">{activity.description}</span>
                   </p>
-                  <span className="text-[10px] text-[#444]">
+                  <span className="text-[11px] text-[#666]">
                     {formatRelativeTime(activity.created_at)}
                   </span>
                 </div>
@@ -317,12 +317,12 @@ export function ProjectsView() {
     return (
       <div className="p-6">
         <div className="mb-6">
-          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#1e1e22]" />
-          <div className="h-3 w-48 animate-pulse rounded bg-[#1e1e22]" />
+          <div className="mb-2 h-4 w-32 animate-pulse rounded bg-[#252529]" />
+          <div className="h-3 w-48 animate-pulse rounded bg-[#252529]" />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-48 animate-pulse rounded-xl border border-[#1e1e22] bg-[#111113]" />
+            <div key={i} className="h-48 animate-pulse rounded-xl border border-[#252529] bg-[#131316]" />
           ))}
         </div>
       </div>
@@ -335,7 +335,7 @@ export function ProjectsView() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-white">Projects</h2>
-            <p className="mt-0.5 text-xs text-[#555]">
+            <p className="mt-0.5 text-xs text-[#777]">
               {projects.filter((p) => p.status === "active").length} active ·{" "}
               {projects.length} total
             </p>
@@ -357,7 +357,7 @@ export function ProjectsView() {
             return (
               <div
                 key={project.id}
-                className="group cursor-pointer rounded-xl border border-[#1e1e22] bg-[#111113] p-5 transition-colors hover:border-[#2a2a2e]"
+                className="group cursor-pointer rounded-xl border border-[#252529] bg-[#131316] p-5 transition-colors hover:border-[#3a3a3e]"
                 onClick={() => setSelectedProject(project)}
               >
                 {/* Header */}
@@ -371,7 +371,7 @@ export function ProjectsView() {
                     <div className="flex items-center gap-2">
                       <Badge
                         variant="outline"
-                        className="border-transparent px-1.5 py-0 text-[10px] capitalize"
+                        className="border-transparent px-1.5 py-0 text-[11px] capitalize"
                         style={{
                           backgroundColor: status.bg,
                           color: status.color,
@@ -381,7 +381,7 @@ export function ProjectsView() {
                       </Badge>
                       <Badge
                         variant="outline"
-                        className="border-transparent px-1.5 py-0 text-[10px]"
+                        className="border-transparent px-1.5 py-0 text-[11px]"
                         style={{
                           backgroundColor: `${priority.color}18`,
                           color: priority.color,
@@ -393,8 +393,8 @@ export function ProjectsView() {
                   </div>
                   {project.agents?.name && (
                     <div
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                      style={{ backgroundColor: project.agents?.color ?? "#666" }}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
+                      style={{ backgroundColor: project.agents?.color ?? "#777" }}
                     >
                       {project.agents.name.substring(0, 2).toUpperCase()}
                     </div>
@@ -403,7 +403,7 @@ export function ProjectsView() {
 
                 {/* Description */}
                 {project.description && (
-                  <p className="mb-4 line-clamp-2 text-xs leading-relaxed text-[#888]">
+                  <p className="mb-4 line-clamp-2 text-xs leading-relaxed text-[#a0a0a0]">
                     {project.description}
                   </p>
                 )}
@@ -411,12 +411,12 @@ export function ProjectsView() {
                 {/* Progress */}
                 <div className="mb-2">
                   <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-[10px] text-[#555]">Progress</span>
-                    <span className="text-[10px] font-medium text-[#999]">
+                    <span className="text-[11px] text-[#777]">Progress</span>
+                    <span className="text-[11px] font-medium text-[#b0b0b0]">
                       {project.progress_percent}%
                     </span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#1e1e22]">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#252529]">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
@@ -429,10 +429,10 @@ export function ProjectsView() {
 
                 {/* Task count + last activity */}
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#555]">
+                  <span className="text-[11px] text-[#777]">
                     {project.completed_tasks}/{project.total_tasks} tasks
                   </span>
-                  <span className="text-[10px] text-[#444]">
+                  <span className="text-[11px] text-[#666]">
                     {formatRelativeTime(project.updated_at)}
                   </span>
                 </div>

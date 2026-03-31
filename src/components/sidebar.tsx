@@ -31,7 +31,7 @@ const navItems: { id: ViewId; label: string; icon: React.ComponentType<{ classNa
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
     <TooltipProvider delayDuration={0}>
-      <aside className="flex h-full w-[52px] flex-col items-center border-r border-[#1e1e22] bg-[#0a0a0b] py-3">
+      <aside className="flex h-full w-[52px] flex-col items-center border-r border-[#252529] bg-[#0a0a0b] py-3">
         {/* Logo */}
         <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
           <span className="text-xs font-bold text-white">MC</span>
@@ -50,8 +50,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
                       isActive
-                        ? "bg-[#1e1e22] text-white"
-                        : "text-[#555] hover:bg-[#151517] hover:text-[#888]"
+                        ? "bg-[#252529] text-white"
+                        : "text-[#777] hover:bg-[#1a1a1e] hover:text-[#a0a0a0]"
                     )}
                   >
                     <Icon className="h-[18px] w-[18px]" />

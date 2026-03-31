@@ -163,7 +163,7 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#1e1e22] bg-[#111113] text-[#e0e0e0] sm:max-w-[480px]">
+      <DialogContent className="border-[#252529] bg-[#131316] text-[#f0f0f0] sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold text-white">
             {isEditing ? "Edit Project" : "Create Project"}
@@ -172,36 +172,36 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
 
         <div className="flex flex-col gap-4 pt-2">
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-[#999]">Name *</Label>
+            <Label className="text-xs text-[#b0b0b0]">Name *</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Project name"
-              className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] placeholder:text-[#444] focus-visible:ring-1 focus-visible:ring-[#333]"
+              className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] placeholder:text-[#666] focus-visible:ring-1 focus-visible:ring-[#444]"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-[#999]">Description</Label>
+            <Label className="text-xs text-[#b0b0b0]">Description</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Project description"
               rows={3}
-              className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] placeholder:text-[#444] focus-visible:ring-1 focus-visible:ring-[#333] resize-none"
+              className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] placeholder:text-[#666] focus-visible:ring-1 focus-visible:ring-[#444] resize-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Status</Label>
+              <Label className="text-xs text-[#b0b0b0]">Status</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as ProjectStatus)}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
+                <SelectContent className="border-[#252529] bg-[#131316]">
                   {statusOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -209,14 +209,14 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-[#999]">Priority</Label>
+              <Label className="text-xs text-[#b0b0b0]">Priority</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as ProjectPriority)}>
-                <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+                <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-[#1e1e22] bg-[#111113]">
+                <SelectContent className="border-[#252529] bg-[#131316]">
                   {priorityOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                    <SelectItem key={opt.value} value={opt.value} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -226,17 +226,17 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-[#999]">Owner</Label>
+            <Label className="text-xs text-[#b0b0b0]">Owner</Label>
             <Select value={ownerId} onValueChange={setOwnerId}>
-              <SelectTrigger className="border-[#1e1e22] bg-[#0a0a0b] text-sm text-[#e0e0e0] focus:ring-1 focus:ring-[#333]">
+              <SelectTrigger className="border-[#252529] bg-[#0a0a0b] text-sm text-[#f0f0f0] focus:ring-1 focus:ring-[#444]">
                 <SelectValue placeholder="No owner" />
               </SelectTrigger>
-              <SelectContent className="border-[#1e1e22] bg-[#111113]">
-                <SelectItem value="none" className="text-sm text-[#666] focus:bg-[#1e1e22] focus:text-white">
+              <SelectContent className="border-[#252529] bg-[#131316]">
+                <SelectItem value="none" className="text-sm text-[#777] focus:bg-[#252529] focus:text-white">
                   No owner
                 </SelectItem>
                 {agents.map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id} className="text-sm text-[#e0e0e0] focus:bg-[#1e1e22] focus:text-white">
+                  <SelectItem key={agent.id} value={agent.id} className="text-sm text-[#f0f0f0] focus:bg-[#252529] focus:text-white">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full" style={{ backgroundColor: agent.color }} />
                       {agent.name}
@@ -261,15 +261,15 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
                     <span className="text-xs">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="border-[#1e1e22] bg-[#111113]">
+                <AlertDialogContent className="border-[#252529] bg-[#131316]">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-sm text-white">Delete project?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-xs text-[#999]">
+                    <AlertDialogDescription className="text-xs text-[#b0b0b0]">
                       This will permanently delete &quot;{project?.name}&quot;. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="border-[#1e1e22] bg-[#0a0a0b] text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white">
+                    <AlertDialogCancel className="border-[#252529] bg-[#0a0a0b] text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white">
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
@@ -289,7 +289,7 @@ export function ProjectDialog({ open, onOpenChange, project, onSaved }: ProjectD
                 variant="ghost"
                 size="sm"
                 onClick={() => onOpenChange(false)}
-                className="text-xs text-[#999] hover:bg-[#1e1e22] hover:text-white"
+                className="text-xs text-[#b0b0b0] hover:bg-[#252529] hover:text-white"
                 disabled={saving}
               >
                 Cancel
